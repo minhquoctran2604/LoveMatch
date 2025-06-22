@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.controller.trChatController;
 import vn.edu.tlu.cse.lovematch.model.data.trMessageUser;
 import vn.edu.tlu.cse.lovematch.model.data.xUser;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.trProfileMyFriendActivity;
