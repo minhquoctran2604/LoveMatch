@@ -41,4 +41,25 @@ public class xUserRepository {
             }
         });
     }
+
+    public void updateUserField(String field, Object value, OnUserActionListener listener) {
+        String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (currentUserId == null) {
+            listener.onFailure("Người dùng chưa đăng nhập");
+            return;
+        }
+
+        usersReference.child(currentUserId).child(field).setValue(value, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    Log.d(TAG, "User field updated successfully: " + field);
+                    listener.onSuccess();
+                } else {
+                    Log.e(TAG, "Failed to update user field: " + field, databaseError.toException());
+                    listener.onFailure(databaseError.getMessage());
+                }
+            }
+        });
+    }
 }
