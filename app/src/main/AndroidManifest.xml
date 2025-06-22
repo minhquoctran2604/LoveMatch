@@ -51,7 +51,6 @@
         <activity android:name=".view.activity.profile.trEditProfileActivity" />
         <activity android:name=".view.activity.profile.trProfileMyFriendActivity" />
         <activity android:name=".view.activity.profile.trEditPhotosActivity" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="vn.edu.tlu.cse.lovematch.fileprovider"
