@@ -1,5 +1,6 @@
 package vn.edu.tlu.cse.lovematch.view.activity.signup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -52,11 +53,23 @@ public class xSelectGenderActivity extends AppCompatActivity {
             String gender = radioButton.getText().toString();
             updateUserGender(gender);
         });
-    }
+    }    private void updateUserGender(String gender) {
+        Toast.makeText(this, "Đang cập nhật giới tính...", Toast.LENGTH_SHORT).show();
+        
+        userRepository.updateUserField("gender", gender, new xUserRepository.OnUserActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(xSelectGenderActivity.this, "Đã chọn giới tính: " + gender, Toast.LENGTH_SHORT).show();
+                // Chuyển đến activity tiếp theo - chọn giới tính ưa thích
+                Intent intent = new Intent(xSelectGenderActivity.this, xPreferGenderActivity.class);
+                startActivity(intent);
+                finish();
+            }
 
-    private void updateUserGender(String gender) {
-        // TODO: Cập nhật thông tin giới tính của người dùng vào database
-        Toast.makeText(this, "Đã chọn giới tính: " + gender, Toast.LENGTH_SHORT).show();
-        finish(); // Hoàn tất quá trình đăng ký và đóng activity
+            @Override
+            public void onFailure(String errorMessage) {
+                Toast.makeText(xSelectGenderActivity.this, "Lỗi khi cập nhật giới tính: " + errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
