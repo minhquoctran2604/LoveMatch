@@ -31,7 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.view.activity.signup.xSignInActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.signup.qSignInActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         if (auth.getCurrentUser() == null) {
-            startActivity(new Intent(this, xSignInActivity.class));
+            startActivity(new Intent(this, qSignInActivity.class));
             finish();
             return;
         }

@@ -23,7 +23,7 @@
         android:label="ListChatFragment" />    <!-- ProfileFragment (Placeholder) -->
     <fragment
         android:id="@+id/profileFragment"
-        android:name="vn.edu.tlu.cse.lovematch.view.fragment.trProfileFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.qProfileFragment"
         android:label="trProfileFragment" />
 
     <!-- ChatUserFragment (Placeholder) -->
