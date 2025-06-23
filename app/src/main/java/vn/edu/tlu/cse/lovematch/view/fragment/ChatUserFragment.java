@@ -30,10 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.data.trMessageUser;
-import vn.edu.tlu.cse.lovematch.model.data.xUser;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.trProfileMyFriendActivity;
+import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
+import vn.edu.tlu.cse.lovematch.model.data.User;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.ProfileMyFriendActivity;
 import vn.edu.tlu.cse.lovematch.view.adapter.trMessageAdapter;
+import vn.edu.tlu.cse.lovematch.controller.ChatController;
 
 public class trChatUserFragment extends Fragment {
     private ImageButton backButton;
@@ -45,13 +46,13 @@ public class trChatUserFragment extends Fragment {
     private EditText messageInput;
     private ImageButton gifButton;
     private ImageButton sendButton;
-    private trChatController controller;
+    private ChatController controller;
     private String friendId;
     private String chatId;
     private String currentUserId;
     private NavController navController;
     private trMessageAdapter messageAdapter;
-    private List<trMessageUser> messageList;
+    private List<MessageUser> messageList;
     private DatabaseReference messagesRef;
 
     @Nullable
@@ -103,7 +104,7 @@ public class trChatUserFragment extends Fragment {
         listenForMessages();
 
         // Khởi tạo Controller
-        controller = new trChatController(this, friendId);
+        controller = new ChatController(this, friendId);
         controller.loadFriendInfo();
 
         // Xử lý các sự kiện click
@@ -127,7 +128,7 @@ public class trChatUserFragment extends Fragment {
         messagesRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                trMessageUser message = snapshot.getValue(trMessageUser.class);
+                MessageUser message = snapshot.getValue(MessageUser.class);
                 if (message != null) {
                     messageAdapter.addMessage(message);
                     messagesRecyclerView.scrollToPosition(messageList.size() - 1);
@@ -149,7 +150,7 @@ public class trChatUserFragment extends Fragment {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                trMessageUser updatedMessage = snapshot.getValue(trMessageUser.class);
+                MessageUser updatedMessage = snapshot.getValue(MessageUser.class);
                 if (updatedMessage != null) {
                     for (int i = 0; i < messageList.size(); i++) {
                         if (messageList.get(i).getMessageId().equals(updatedMessage.getMessageId())) {
@@ -179,7 +180,7 @@ public class trChatUserFragment extends Fragment {
     }
 
     // Phương thức để Controller gọi để cập nhật giao diện
-    public void updateUserInfo(xUser user) {
+    public void updateUserInfo(User user) {
         if (user != null) {
             userName.setText(user.getName() != null ? user.getName() : "N/A");
 
@@ -209,7 +210,7 @@ public class trChatUserFragment extends Fragment {
     }
 
     public void startProfileMyFriendActivity() {
-        Intent intent = new Intent(getActivity(), trProfileMyFriendActivity.class);
+        Intent intent = new Intent(getActivity(), ProfileMyFriendActivity.class);
         intent.putExtra("friendId", friendId);
         startActivity(intent);
     }

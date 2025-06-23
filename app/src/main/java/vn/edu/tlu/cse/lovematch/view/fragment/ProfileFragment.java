@@ -24,8 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.trEditProfileActivity;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.xSettingActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.EditProfileActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.SettingActivity;
 import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
 
 import java.util.ArrayList;
@@ -69,10 +69,10 @@ public class trProfileFragment extends Fragment {
         });
 
         settingsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), xSettingActivity.class);
+            Intent intent = new Intent(getContext(), SettingActivity.class);
             startActivity(intent);
         });        editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), trEditProfileActivity.class);
+            Intent intent = new Intent(getContext(), EditProfileActivity.class);
             startActivity(intent);
         });
 
