@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.yuyakaido.android.cardstackview.CardStackView
+        android:id="@+id/card_stack_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <View
+        android:id="@+id/skip_circle"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="120dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/circle_background"
+        android:visibility="invisible" />
+
+    <View
+        android:id="@+id/like_circle"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="120dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/circle_background"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/skip_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/skip_circle"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_skip"
+        android:background="@android:color/transparent" />
+
+    <ImageButton
+        android:id="@+id/like_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/like_circle"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_like"
+        android:background="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/match_notification_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:text="Bạn đã có một match!"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/match_notification_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/transparent"
+        android:visibility="gone" />
+
+</RelativeLayout>

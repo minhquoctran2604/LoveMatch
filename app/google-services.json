@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "378567233346",
+    "project_id": "lovematchapp-66188",
+    "storage_bucket": "lovematchapp-66188.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378567233346:android:893910daaab3f4bbad82db",
+        "android_client_info": {
+          "package_name": "vn.edu.tlu.cse.lovematch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS92-7foLzccxlkqwch5dNMQlSP9tWfRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

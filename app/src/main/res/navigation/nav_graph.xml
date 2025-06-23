@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_swipe">
+
+    <fragment
+        android:id="@+id/nav_swipe"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment"
+        android:label="Swipe" />
+
+    <fragment
+        android:id="@+id/nav_like"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.LikeFragment"
+        android:label="Likes" />
+
+</navigation>

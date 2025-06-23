@@ -1,6 +1,5 @@
 package vn.edu.tlu.cse.lovematch.controller;
 
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -22,7 +21,6 @@ import com.yuyakaido.android.cardstackview.Duration;
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.model.data.User;
-import vn.edu.tlu.cse.lovematch.view.adapter.CardStackAdapter;
 import vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +31,6 @@ import java.util.Set;
 import java.util.Stack;
 
 public class SwipeController {
-
     private static final String TAG = "SwipeController";
     private static final int PAGE_SIZE = 10;
 
@@ -70,10 +67,10 @@ public class SwipeController {
         }
     }
 
-    public chSwipeController(SwipeFragment fragment, CardStackView cardStackView, View skipCircle, View likeCircle,
-                             ImageButton skipButton, ImageButton likeButton, TextView matchNotificationText,
-                             View matchNotificationLayout, NavController navController,
-                             List<User> userList, CardStackAdapter adapter) {
+    public SwipeController(SwipeFragment fragment, CardStackView cardStackView, View skipCircle, View likeCircle,
+                           ImageButton skipButton, ImageButton likeButton, TextView matchNotificationText,
+                           View matchNotificationLayout, NavController navController,
+                           List<User> userList, CardStackAdapter adapter) {
         this.fragment = fragment;
         this.cardStackView = cardStackView;
         this.skipCircle = skipCircle;
@@ -85,10 +82,10 @@ public class SwipeController {
         this.navController = navController;
         this.database = FirebaseDatabase.getInstance().getReference();
         this.matchNotificationsRef = database.child("match_notifications");
-        this.currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        this.userList = userList;
-        this.adapter = adapter;
-        this.layoutManager = new CardStackLayoutManager(fragment.getContext());
+        this.currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        this.userList = userList != null ? userList : new ArrayList<>();
+        this.adapter = adapter != null ? adapter : new CardStackAdapter(new ArrayList<>());
+        this.layoutManager = new CardStackLayoutManager(fragment.requireContext());
         this.matchedUserIds = new HashSet<>();
         this.skippedUserIds = new HashSet<>();
         this.isSkipButtonPressed = false;
@@ -100,7 +97,8 @@ public class SwipeController {
     }
 
     private void initializeCardStack() {
-        // Set up swipe animation for the card stack
+        if (cardStackView == null) return;
+
         SwipeAnimationSetting swipeAnimationSetting = new SwipeAnimationSetting.Builder()
                 .setDirection(Direction.Right)
                 .setDuration(Duration.Normal.duration)
@@ -108,8 +106,8 @@ public class SwipeController {
         layoutManager.setSwipeAnimationSetting(swipeAnimationSetting);
         cardStackView.setLayoutManager(layoutManager);
 
-        // Skip button listener
         skipButton.setOnClickListener(v -> {
+            if (isLoading || userList.isEmpty()) return;
             Log.d(TAG, "Skip button clicked: Performing swipe left");
             isSkipButtonPressed = true;
             SwipeAnimationSetting setting = new SwipeAnimationSetting.Builder()
@@ -121,8 +119,8 @@ public class SwipeController {
             fragment.showSkipAnimationOnButton(skipButton);
         });
 
-        // Like button listener
         likeButton.setOnClickListener(v -> {
+            if (isLoading || userList.isEmpty()) return;
             Log.d(TAG, "Like button clicked: Performing swipe right");
             isSkipButtonPressed = false;
             SwipeAnimationSetting setting = new SwipeAnimationSetting.Builder()
@@ -136,7 +134,6 @@ public class SwipeController {
     }
 
     public void resetPagination() {
-        // Reset pagination state
         lastUserId = null;
         userList.clear();
         swipeHistory.clear();
@@ -145,18 +142,12 @@ public class SwipeController {
     }
 
     public void loadUsers() {
-        if (isLoading) {
-            Log.d(TAG, "loadUsers: Already loading, skipping...");
-            return;
-        }
-
-        if (currentUser == null) {
-            Log.d(TAG, "loadUsers: Current user is null, waiting...");
+        if (isLoading || currentUser == null || currentUserId == null) {
+            Log.d(TAG, "loadUsers: Loading or user data unavailable, skipping...");
             return;
         }
 
         isLoading = true;
-        // Fetch matched users
         database.child("matches").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -166,7 +157,6 @@ public class SwipeController {
                 }
                 Log.d(TAG, "Matched users: " + matchedUserIds);
 
-                // Build query for users
                 Query query = database.child("users").orderByKey();
                 if (lastUserId != null) {
                     query = query.startAfter(lastUserId);
@@ -175,13 +165,12 @@ public class SwipeController {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         List<User> newUsers = new ArrayList<>();
-                        boolean hasOtherGender = snapshot.getChildren().iterator().hasNext() &&
-                                snapshot.getChildren().iterator().next().getValue(User.class).getGender().equals("Khác");
+                        boolean hasOtherGender = !snapshot.getChildren().isEmpty() &&
+                                "Khác".equals(snapshot.getChildren().iterator().next().getValue(User.class).getGender());
 
-                        // Filter users based on gender and match status
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             User user = userSnapshot.getValue(User.class);
-                            if (user != null && isValidUser(user)) {
+                            if (isValidUser(user)) {
                                 String currentUserGender = currentUser.getGender();
                                 String userGender = user.getGender();
                                 if (shouldIncludeUser(currentUserGender, userGender, hasOtherGender)) {
@@ -243,6 +232,10 @@ public class SwipeController {
     }
 
     private void loadCurrentUser() {
+        if (currentUserId == null) {
+            fragment.showError("Không tìm thấy ID người dùng hiện tại");
+            return;
+        }
         database.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -250,8 +243,8 @@ public class SwipeController {
                 if (currentUser != null) {
                     Log.d(TAG, "Current user loaded: " + currentUser.getName() + ", Gender: " + currentUser.getGender());
                     adapter.setCurrentUserLocation(
-                            currentUser.isLocationEnabled() ? currentUser.getLatitude() : 0.0,
-                            currentUser.isLocationEnabled() ? currentUser.getLongitude() : 0.0
+                            currentUser.getLatitude(),
+                            currentUser.getLongitude()
                     );
                     loadUsers();
                 } else {
@@ -301,6 +294,7 @@ public class SwipeController {
     }
 
     private void updateLikedBy(User otherUser) {
+        if (otherUser == null || otherUser.getUid() == null) return;
         database.child("likes").child(otherUser.getUid()).child(currentUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -322,7 +316,7 @@ public class SwipeController {
 
     public void undoLastSwipe() {
         if (swipeHistory.isEmpty()) {
-            Toast.makeText(fragment.getContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
+            Toast.makeText(fragment.requireContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -340,10 +334,11 @@ public class SwipeController {
         userList.add(0, user);
         adapter.notifyDataSetChanged();
         cardStackView.rewind();
-        Toast.makeText(fragment.getContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
+        Toast.makeText(fragment.requireContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
     }
 
     private void likeUser(User otherUser) {
+        if (otherUser == null || otherUser.getUid() == null) return;
         database.child("likes").child(currentUserId).child(otherUser.getUid()).setValue(true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -355,6 +350,7 @@ public class SwipeController {
     }
 
     private void checkForMatch(User otherUser) {
+        if (otherUser == null || otherUser.getUid() == null) return;
         database.child("likes").child(otherUser.getUid()).child(currentUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -384,12 +380,12 @@ public class SwipeController {
     }
 
     private void saveMatch(String otherUserId, String chatId) {
+        if (otherUserId == null || chatId == null) return;
         database.child("matches").child(currentUserId).child(otherUserId).setValue(true);
         database.child("matches").child(otherUserId).child(currentUserId).setValue(true);
         database.child("chats").child(chatId).child("participants").child(currentUserId).setValue(true);
         database.child("chats").child(chatId).child("participants").child(otherUserId).setValue(true);
 
-        // Clear likes
         database.child("likes").child(currentUserId).child(otherUserId).removeValue();
         database.child("likedBy").child(currentUserId).child(otherUserId).removeValue();
         database.child("likes").child(otherUserId).child(currentUserId).removeValue();
@@ -414,7 +410,9 @@ public class SwipeController {
     private void handleDatabaseError(Exception exception, String message) {
         String errorMessage = exception != null ? message + ": " + exception.getMessage() : message;
         Log.e(TAG, errorMessage);
-        fragment.showError(errorMessage);
+        if (fragment != null) {
+            fragment.showError(errorMessage);
+        }
         isLoading = false;
     }
 }
