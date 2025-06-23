@@ -84,6 +84,9 @@ public class ListChatFragment extends Fragment {
 
         controller = new ListChatController(this);
         controller.loadNotifications();
+//        // Bước 2: Tạo và hiển thị dữ liệu giả
+//        List<Notification> dummyData = createDummyNotifications();
+//        updateNotifications(dummyData); // Gọi trực tiếp hàm updateNotifications với data giả
     }
 
     private void onNotificationClicked(Notification notification) {
@@ -126,4 +129,16 @@ public class ListChatFragment extends Fragment {
             controller.onDestroy();
         }
     }
+    // Đặt hàm này bên dưới hàm updateNotifications hoặc ở cuối file fragment
+//    private List<Notification> createDummyNotifications() {
+//        List<Notification> list = new ArrayList<>();
+//
+//        // Notification(String userId, String userName, String userImage, String lastMessage, String time, boolean isUnread, long timestamp)
+//        list.add(new Notification("user_001", "Phương Mỹ Chi", "url_image", "Bạn có tin nhắn mới!", "10:30", true, System.currentTimeMillis()));
+//        list.add(new Notification("user_002", "Thuỳ Tiên", "url_image", "Chào bạn, làm quen nhé?", "09:15", false, System.currentTimeMillis() - 3600000));
+//        list.add(new Notification("user_003", "Sơn Tùng M-TP", "url_image", "Đã thích hồ sơ của bạn.", "Hôm qua", true, System.currentTimeMillis() - 86400000));
+//        list.add(new Notification("user_004", "HIEUTHUHAI", "url_image", "Bạn thế nào rồi?", "Thứ 2", false, System.currentTimeMillis() - (3 * 86400000)));
+//
+//        return list;
+//    }
 }

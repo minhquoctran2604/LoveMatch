@@ -31,9 +31,10 @@ import java.util.List;
 import java.util.Map;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.ProfileMyFriendActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.qProfileMyFriendActivity;
 import vn.edu.tlu.cse.lovematch.view.adapter.MessageAdapter;
 import vn.edu.tlu.cse.lovematch.controller.ChatController;
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
 
 public class ChatUserFragment extends Fragment {
     private ImageButton backButton;
@@ -179,7 +180,7 @@ public class ChatUserFragment extends Fragment {
     }
 
     // Phương thức để Controller gọi để cập nhật giao diện
-    public void updateUserInfo(User user) {
+    public void updateUserInfo(qUser user) {
         if (user != null) {
             userName.setText(user.getName() != null ? user.getName() : "N/A");
 
@@ -209,7 +210,7 @@ public class ChatUserFragment extends Fragment {
     }
 
     public void startProfileMyFriendActivity() {
-        Intent intent = new Intent(getActivity(), ProfileMyFriendActivity.class);
+        Intent intent = new Intent(getActivity(), qProfileMyFriendActivity.class);
         intent.putExtra("friendId", friendId);
         startActivity(intent);
     }

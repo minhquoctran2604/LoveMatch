@@ -3,17 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_profile">
-
+    android:background="@drawable/background_pink">
+    <!-- logo -->
+    <ImageView
+        android:id="@+id/app_logo"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="44dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_logo_like"
+        android:contentDescription="logo" />
     <!-- SwipeRefreshLayout bao quanh RecyclerView -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/app_logo"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="102dp"
-        android:layout_marginBottom="0dp">
+        android:layout_marginBottom="0dp"
+        android:textColor="@android:color/black"
+        android:contentDescription="Swipe to refresh">
 
         <!-- RecyclerView để hiển thị danh sách thông báo -->
         <androidx.recyclerview.widget.RecyclerView
@@ -21,6 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingHorizontal="16dp"
+            android:textColor="@android:color/black"
+            android:contentDescription="Notifications List"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

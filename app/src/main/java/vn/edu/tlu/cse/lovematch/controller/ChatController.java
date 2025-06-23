@@ -12,7 +12,7 @@ import java.util.Map;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
 import vn.edu.tlu.cse.lovematch.model.repository.ChatRepository;
 import vn.edu.tlu.cse.lovematch.view.fragment.ChatUserFragment;
-
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
 public class ChatController {
 
     private final ChatUserFragment fragment;
@@ -51,7 +51,7 @@ public class ChatController {
     public void loadFriendInfo() {
         chatRepository.getUserInfo(new ChatRepository.OnResultListener() {
             @Override
-            public void onSuccess(User user) {
+            public void onSuccess(qUser user) {
                 fragment.updateUserInfo(user);
             }
 

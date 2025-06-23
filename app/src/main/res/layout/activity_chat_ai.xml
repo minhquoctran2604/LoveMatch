@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background">
+    android:background="@drawable/background_pink">
 
     <!-- Header -->
     <ImageView
@@ -13,26 +13,39 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         android:contentDescription="Back"
-        android:src="@drawable/ic_back"
+        android:src="@drawable/ic_arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/chatbot_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Chatbot Icon"
+        android:src="@drawable/ic_chatbot"
+        app:layout_constraintBottom_toBottomOf="@+id/back_arrow"
+        app:layout_constraintStart_toEndOf="@id/back_arrow"
+        app:layout_constraintTop_toTopOf="@+id/back_arrow" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
         android:text="LOVE AI"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/back_arrow"
+        app:layout_constraintStart_toEndOf="@id/chatbot_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- RecyclerView for chat messages -->
+
+    <!-- Input Layout -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="0dp"
@@ -41,10 +54,12 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/input_layout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintVertical_bias="0.0"
+        android:contentDescription="chat"/>
 
-    <!-- Input Layout -->
     <LinearLayout
         android:id="@+id/input_layout"
         android:layout_width="0dp"
@@ -61,8 +76,11 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
+            android:minHeight="48dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
             android:id="@+id/message_input"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
@@ -71,17 +89,15 @@
             android:paddingEnd="12dp"
             android:textColor="@android:color/black"
             android:textColorHint="#B0B0B0"
-            android:textSize="16sp" />
-
+            android:textSize="16dp" />
         <ImageButton
             android:id="@+id/send_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
             android:contentDescription="Send"
-            android:src="@drawable/ic_sendchat" />
-
+            android:src="@drawable/ic_next_2" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

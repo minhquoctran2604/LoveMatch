@@ -7,7 +7,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
 public class ChatRepository {
 
     private final DatabaseReference userRef;
@@ -22,7 +22,7 @@ public class ChatRepository {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
+                    qUser user = snapshot.getValue(qUser.class);
                     if (user != null) {
                         listener.onSuccess(user);
                     } else {
@@ -41,7 +41,7 @@ public class ChatRepository {
     }
 
     public interface OnResultListener {
-        void onSuccess(User user);
+        void onSuccess(qUser user);
         void onError(String error);
         void onLoading();
     }

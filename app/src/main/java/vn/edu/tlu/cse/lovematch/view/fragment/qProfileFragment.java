@@ -26,7 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.qEditProfileActivity;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.qSettingActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.PhotoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
