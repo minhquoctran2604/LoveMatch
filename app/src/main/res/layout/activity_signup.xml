@@ -84,17 +84,16 @@
 						android:scaleType="fitXY"
 					/>
 					<EditText
-						android:inputType="text"
+						android:id="@+id/email_input"
 						android:hint="Email"
+						android:inputType="textEmailAddress"
 						android:background="@null"
-						android:id="@+id/rxjcekdfs0i"
 						android:textColor="#717086"
 						android:textSize="16sp"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:paddingVertical="2dp"
-					/>
+						android:paddingVertical="2dp" />
 				</LinearLayout>
 				<LinearLayout
 					android:id="@+id/rl1bgwdnh0br"
@@ -117,17 +116,16 @@
 						android:scaleType="fitXY"
 					/>
 					<EditText
-						android:inputType="text"
+						android:id="@+id/username_input"
 						android:hint="Tài khoản"
+						android:inputType="textPersonName"
 						android:background="@null"
-						android:id="@+id/r7e6a35qqn4y"
 						android:textColor="#717086"
 						android:textSize="16sp"
 						android:layout_width="0dp"
 						android:layout_height="wrap_content"
 						android:layout_weight="1"
-						android:paddingVertical="2dp"
-					/>
+						android:paddingVertical="2dp" />
 				</LinearLayout>
 				<LinearLayout
 					android:id="@+id/r4m3a3qu0omi"
@@ -151,16 +149,17 @@
 						android:src="@mipmap/ic_launcher"
 						android:scaleType="fitXY"
 					/>
-					<TextView
-						android:id="@+id/rx2iv0hg2nfb"
+					<EditText
+						android:id="@+id/password_input"
+						android:hint="Mật khẩu"
+						android:inputType="textPassword"
+						android:background="@null"
 						android:textColor="#717086"
 						android:textSize="16sp"
+						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:layout_width="match_parent"
 						android:layout_weight="1"
-						android:gravity="center"
-						android:text="Mật khẩu"
-					/>
+						android:paddingVertical="2dp" />
 					<com.google.android.material.imageview.ShapeableImageView
 						android:id="@+id/ri6017z14kcj"
 						app:shapeAppearanceOverlay="@style/cr12"
@@ -192,16 +191,17 @@
 						android:src="@mipmap/ic_launcher"
 						android:scaleType="fitXY"
 					/>
-					<TextView
-						android:id="@+id/rb598g0eping"
+					<EditText
+						android:id="@+id/confirm_password_input"
+						android:hint="Xác nhận mật khẩu"
+						android:inputType="textPassword"
+						android:background="@null"
 						android:textColor="#717086"
 						android:textSize="16sp"
+						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:layout_width="match_parent"
 						android:layout_weight="1"
-						android:gravity="center"
-						android:text="Xác nhận mật khẩu"
-					/>
+						android:paddingVertical="2dp" />
 					<com.google.android.material.imageview.ShapeableImageView
 						android:id="@+id/rl6z37fatool"
 						app:shapeAppearanceOverlay="@style/cr12"
@@ -211,26 +211,49 @@
 						android:scaleType="fitXY"
 					/>
 				</LinearLayout>
+				<!-- Thêm trường Nơi ở -->
 				<LinearLayout
-					android:id="@+id/rhriqxpxbk55"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:gravity="center_horizontal"
-					android:background="@drawable/dangky1"
-					android:paddingVertical="14dp"
+					android:gravity="center_vertical"
+					android:background="@drawable/cr12bf6f6f8"
+					android:paddingVertical="12dp"
+					android:paddingHorizontal="8dp"
+					android:layout_marginBottom="16dp"
 					android:layout_marginHorizontal="24dp"
-					android:clickable="true"
-					android:focusable="true"
-					android:orientation="vertical">
-					<TextView
-						android:id="@+id/r1i6u22gnhqo"
-						android:textColor="#FFFFFF"
+					android:orientation="horizontal">
+					<EditText
+						android:id="@+id/residence_input"
+						android:hint="Nơi ở"
+						android:inputType="text"
+						android:background="@null"
+						android:textColor="#717086"
 						android:textSize="16sp"
+						android:layout_width="0dp"
 						android:layout_height="wrap_content"
-						android:layout_width="wrap_content"
-						android:text="ĐĂNG KÝ"
-					/>
+						android:layout_weight="1"
+						android:paddingVertical="2dp" />
 				</LinearLayout>
+				<!-- Thêm warning text -->
+				<TextView
+					android:id="@+id/warning_text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:textColor="#FF5722"
+					android:textSize="14sp"
+					android:visibility="gone"
+					android:layout_marginBottom="8dp" />
+				<!-- Nút đăng ký -->
+				<Button
+					android:id="@+id/sign_up_button"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="ĐĂNG KÝ"
+					android:textColor="#FFFFFF"
+					android:textSize="16sp"
+					android:background="@drawable/dangky1"
+					android:layout_marginHorizontal="24dp"
+					android:layout_marginBottom="16dp" />
 			</LinearLayout>
 			<LinearLayout
 				android:id="@+id/rsg2bm5lvbzi"

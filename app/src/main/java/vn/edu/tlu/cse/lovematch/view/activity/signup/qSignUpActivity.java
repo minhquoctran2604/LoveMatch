@@ -42,6 +42,13 @@ public class qSignUpActivity extends AppCompatActivity {
         findViewById(R.id.sign_up_button).setOnClickListener(v -> {
             validateAndRegisterUser();
         });
+
+        // Thêm sự kiện click cho TextView đăng nhập
+        findViewById(R.id.r1gx798wd3dt).setOnClickListener(v -> {
+            Intent intent = new Intent(qSignUpActivity.this, qSignInActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void validateAndRegisterUser() {
