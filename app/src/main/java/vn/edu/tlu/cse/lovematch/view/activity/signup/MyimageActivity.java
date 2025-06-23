@@ -22,20 +22,18 @@ import com.google.firebase.storage.StorageReference;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.repository.xUserRepository;
+import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
 
-public class xMyimageActivity extends AppCompatActivity {
+public class MyimageActivity extends AppCompatActivity {
 
     private static final String TAG = "MyImageActivity";
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
     private ImageView selectedPhotoPreview;
-    private xUserRepository userRepository;
+    private UserRepository userRepository;
     private StorageReference storageRef;
     private ActivityResultLauncher<String> pickImageLauncher;
     private ActivityResultLauncher<Intent> takePictureLauncher;
@@ -46,7 +44,7 @@ public class xMyimageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myimage);
 
-        userRepository = new xUserRepository();
+        userRepository = new UserRepository();
         storageRef = FirebaseStorage.getInstance().getReference("user_photos");
 
         selectedPhotoPreview = findViewById(R.id.selected_photo_preview);
@@ -162,7 +160,7 @@ public class xMyimageActivity extends AppCompatActivity {
     }
 
     private void goToNextActivity() {
-        Intent intent = new Intent(xMyimageActivity.this, xMapActivity.class);
+        Intent intent = new Intent(MyimageActivity.this, MapActivity.class);
         startActivity(intent);
         finish();
     }

@@ -33,10 +33,10 @@ import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
 import vn.edu.tlu.cse.lovematch.model.data.User;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.ProfileMyFriendActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trMessageAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.MessageAdapter;
 import vn.edu.tlu.cse.lovematch.controller.ChatController;
 
-public class trChatUserFragment extends Fragment {
+public class ChatUserFragment extends Fragment {
     private ImageButton backButton;
     private ImageView userImage;
     private TextView userName;
@@ -51,7 +51,7 @@ public class trChatUserFragment extends Fragment {
     private String chatId;
     private String currentUserId;
     private NavController navController;
-    private trMessageAdapter messageAdapter;
+    private MessageAdapter messageAdapter;
     private List<MessageUser> messageList;
     private DatabaseReference messagesRef;
 
@@ -96,7 +96,7 @@ public class trChatUserFragment extends Fragment {
 
         // Khởi tạo RecyclerView và MessageAdapter
         messageList = new ArrayList<>();
-        messageAdapter = new trMessageAdapter(messageList, currentUserId);
+        messageAdapter = new MessageAdapter(messageList, currentUserId);
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesRecyclerView.setAdapter(messageAdapter);
 

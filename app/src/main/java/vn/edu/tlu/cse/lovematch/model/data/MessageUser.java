@@ -1,6 +1,6 @@
 package vn.edu.tlu.cse.lovematch.model.data;
 
-public class trMessageUser {
+public class MessageUser {
     private String messageId;
     private String senderId;
     private String message;
@@ -8,9 +8,9 @@ public class trMessageUser {
     private String senderImage;
     private String status; // Trạng thái: "sent" hoặc "seen"
 
-    public trMessageUser() {}
+    public MessageUser() {}
 
-    public trMessageUser(String messageId, String senderId, String message, long timestamp, String senderImage, String status) {
+    public MessageUser(String messageId, String senderId, String message, long timestamp, String senderImage, String status) {
         this.messageId = messageId;
         this.senderId = senderId;
         this.message = message;

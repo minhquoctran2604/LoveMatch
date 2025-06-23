@@ -19,10 +19,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.view.activity.signup.xMapActivity;
-import vn.edu.tlu.cse.lovematch.view.activity.signup.xSignInActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.signup.MapActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.signup.SignInActivity;
 
-public class xSettingActivity extends AppCompatActivity {
+public class SettingActivity extends AppCompatActivity {
 
     private Button notificationButton;
     private Button locationButton;
@@ -56,7 +56,7 @@ public class xSettingActivity extends AppCompatActivity {
         // --- Xử lý sự kiện click ---
         notificationButton.setOnClickListener(v -> toggleNotifications());
         locationButton.setOnClickListener(v -> {
-            Intent intent = new Intent(xSettingActivity.this, xMapActivity.class);
+            Intent intent = new Intent(SettingActivity.this, MapActivity.class);
             intent.putExtra("fromSettings", true); // Gửi extra để báo rằng người dùng vào từ Settings
             startActivity(intent);
         });
@@ -79,7 +79,7 @@ public class xSettingActivity extends AppCompatActivity {
         editor.putBoolean(NOTIFICATIONS_ENABLED_KEY, newStatus);
         editor.apply();
 
-        Toast.makeText(xSettingActivity.this, newStatus ? "Đã bật thông báo" : "Đã tắt thông báo", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SettingActivity.this, newStatus ? "Đã bật thông báo" : "Đã tắt thông báo", Toast.LENGTH_SHORT).show();
         updateNotificationButtonState();
     }
 
@@ -123,7 +123,7 @@ public class xSettingActivity extends AppCompatActivity {
                 }
 
                 AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
-                Toast.makeText(xSettingActivity.this, "Đang xác thực...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingActivity.this, "Đang xác thực...", Toast.LENGTH_SHORT).show();
                 positiveButton.setEnabled(false);
 
                 user.reauthenticate(credential)
@@ -161,7 +161,7 @@ public class xSettingActivity extends AppCompatActivity {
                                     etCurrentPassword.setError("Mật khẩu hiện tại không đúng");
                                 } else {
                                     etCurrentPassword.setError("Xác thực thất bại");
-                                    Toast.makeText(xSettingActivity.this, "Lỗi: " + reauthTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SettingActivity.this, "Lỗi: " + reauthTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                                 etCurrentPassword.requestFocus();
                             }
@@ -173,7 +173,7 @@ public class xSettingActivity extends AppCompatActivity {
     }
 
     private void updatePasswordInFirebase(FirebaseUser user, String newPassword, AlertDialog dialog, Button positiveButton) {
-        Toast.makeText(xSettingActivity.this, "Đang cập nhật mật khẩu...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SettingActivity.this, "Đang cập nhật mật khẩu...", Toast.LENGTH_SHORT).show();
         if (positiveButton != null) positiveButton.setEnabled(false);
 
         user.updatePassword(newPassword)
@@ -182,19 +182,19 @@ public class xSettingActivity extends AppCompatActivity {
 
                     if (updateTask.isSuccessful()) {
                         Log.d(TAG, "User password updated.");
-                        Toast.makeText(xSettingActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     } else {
                         Log.w(TAG, "Error updating password", updateTask.getException());
-                        Toast.makeText(xSettingActivity.this, "Đổi mật khẩu thất bại: " + updateTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(SettingActivity.this, "Đổi mật khẩu thất bại: " + updateTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
     private void logoutUser() {
         mAuth.signOut();
-        Toast.makeText(xSettingActivity.this, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(xSettingActivity.this, xSignInActivity.class);
+        Toast.makeText(SettingActivity.this, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(SettingActivity.this, SignInActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

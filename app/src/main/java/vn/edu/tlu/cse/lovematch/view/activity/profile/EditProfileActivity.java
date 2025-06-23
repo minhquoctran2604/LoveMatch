@@ -20,7 +20,7 @@ import vn.edu.tlu.cse.lovematch.R;
 import java.util.HashMap;
 import java.util.Map;
 
-public class trEditProfileActivity extends AppCompatActivity {
+public class EditProfileActivity extends AppCompatActivity {
 
     private ImageView backArrow;
     private ImageView settingsIcon;
@@ -66,12 +66,12 @@ public class trEditProfileActivity extends AppCompatActivity {
         backArrow.setOnClickListener(v -> finish());
 
         settingsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(trEditProfileActivity.this, xSettingActivity.class);
+            Intent intent = new Intent(EditProfileActivity.this, SettingActivity.class);
             startActivity(intent);
         });
 
         editPhotoButton.setOnClickListener(v -> {
-            Intent intent = new Intent(trEditProfileActivity.this, trEditPhotosActivity.class);
+            Intent intent = new Intent(EditProfileActivity.this, EditPhotosActivity.class);
             startActivity(intent);
         });
 
@@ -128,7 +128,7 @@ public class trEditProfileActivity extends AppCompatActivity {
 
                     // Hiển thị ảnh đại diện
                     if (avatarUrl != null) {
-                        Glide.with(trEditProfileActivity.this)
+                        Glide.with(EditProfileActivity.this)
                                 .load(avatarUrl)
                                 .placeholder(R.drawable.gai1)
                                 .error(R.drawable.gai1)
@@ -137,13 +137,13 @@ public class trEditProfileActivity extends AppCompatActivity {
                         avatarImage.setImageResource(R.drawable.gai1);
                     }
                 } else {
-                    Toast.makeText(trEditProfileActivity.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProfileActivity.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(trEditProfileActivity.this, "Lỗi khi tải thông tin: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditProfileActivity.this, "Lỗi khi tải thông tin: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }    private void saveUserProfile() {
@@ -157,7 +157,7 @@ public class trEditProfileActivity extends AppCompatActivity {
         String occupation = editOccupation.getText().toString().trim();
 
         // Hiển thị thông báo đang xử lý
-        Toast.makeText(trEditProfileActivity.this, "Đang cập nhật hồ sơ...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(EditProfileActivity.this, "Đang cập nhật hồ sơ...", Toast.LENGTH_SHORT).show();
 
         // Tạo Map chứa tất cả data cần update - cách này hiệu quả hơn
         Map<String, Object> userUpdates = new HashMap<>();
@@ -177,13 +177,13 @@ public class trEditProfileActivity extends AppCompatActivity {
         
         userRef.updateChildren(userUpdates)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(trEditProfileActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProfileActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
                     
                     // Tự động quay về sau khi lưu thành công
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(trEditProfileActivity.this, "Lỗi khi cập nhật hồ sơ: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditProfileActivity.this, "Lỗi khi cập nhật hồ sơ: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 }

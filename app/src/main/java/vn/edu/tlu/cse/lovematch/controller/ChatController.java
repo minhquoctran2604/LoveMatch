@@ -9,22 +9,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
-import vn.edu.tlu.cse.lovematch.model.data.trMessageUser;
-import vn.edu.tlu.cse.lovematch.model.data.xUser;
-import vn.edu.tlu.cse.lovematch.model.repository.trChatRepository;
-import vn.edu.tlu.cse.lovematch.view.fragment.trChatUserFragment;
+import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
+import vn.edu.tlu.cse.lovematch.model.data.User;
+import vn.edu.tlu.cse.lovematch.model.repository.ChatRepository;
+import vn.edu.tlu.cse.lovematch.view.fragment.ChatUserFragment;
 
-public class trChatController {
+public class ChatController {
 
-    private final trChatUserFragment fragment;
-    private final trChatRepository chatRepository;
+    private final ChatUserFragment fragment;
+    private final ChatRepository chatRepository;
     private final String friendId;
     private String currentUserImage;
 
-    public trChatController(trChatUserFragment fragment, String friendId) {
+    public ChatController(ChatUserFragment fragment, String friendId) {
         this.fragment = fragment;
         this.friendId = friendId;
-        this.chatRepository = new trChatRepository(friendId);
+        this.chatRepository = new ChatRepository(friendId);
         loadCurrentUserImage();
     }
 
@@ -35,7 +35,7 @@ public class trChatController {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    xUser user = snapshot.getValue(xUser.class);
+                    User user = snapshot.getValue(User.class);
                     if (user != null && user.getPhotos() != null && !user.getPhotos().isEmpty()) {
                         currentUserImage = user.getPhotos().get(0);
                     }
@@ -50,9 +50,9 @@ public class trChatController {
     }
 
     public void loadFriendInfo() {
-        chatRepository.getUserInfo(new trChatRepository.OnResultListener() {
+        chatRepository.getUserInfo(new ChatRepository.OnResultListener() {
             @Override
-            public void onSuccess(xUser user) {
+            public void onSuccess(User user) {
                 fragment.updateUserInfo(user);
             }
 
@@ -101,7 +101,7 @@ public class trChatController {
         }
 
         long timestamp = System.currentTimeMillis();
-        trMessageUser message = new trMessageUser(messageId, currentUserId, messageText, timestamp, currentUserImage, "sent");
+        MessageUser message = new MessageUser(messageId, currentUserId, messageText, timestamp, currentUserImage, "sent");
 
         Map<String, Object> messageValues = new HashMap<>();
         messageValues.put("messageId", message.getMessageId());

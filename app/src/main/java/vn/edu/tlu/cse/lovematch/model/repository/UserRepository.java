@@ -6,13 +6,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import vn.edu.tlu.cse.lovematch.model.data.xUser;
+import vn.edu.tlu.cse.lovematch.model.data.User;
 
-public class xUserRepository {
+public class UserRepository {
     private static final String TAG = "UserRepository";
     private final DatabaseReference usersReference;
 
-    public xUserRepository() {
+    public UserRepository() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         usersReference = database.getReference("users");
     }
@@ -22,7 +22,7 @@ public class xUserRepository {
         void onFailure(String errorMessage);
     }
 
-    public void saveUser(xUser user, OnUserActionListener listener) {
+    public void saveUser(User user, OnUserActionListener listener) {
         if (user == null || user.getId() == null) {
             listener.onFailure("Thông tin người dùng không hợp lệ");
             return;

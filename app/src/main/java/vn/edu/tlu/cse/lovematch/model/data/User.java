@@ -2,7 +2,7 @@ package vn.edu.tlu.cse.lovematch.model.data;
 
 import java.util.List;
 
-public class xUser {
+public class User {
     private String uid;
     private String name;
     private String email;
@@ -15,10 +15,10 @@ public class xUser {
     private String bio;
     private int age;
 
-    public xUser() {}
+    public User() {}
 
     // Constructor đầy đủ
-    public xUser(String uid, String name, String email, String gender,String dateOfBirth, String residence, List<String> photos,double latitude, double longitude, String bio, int age) {
+    public User(String uid, String name, String email, String gender, String dateOfBirth, String residence, List<String> photos, double latitude, double longitude, String bio, int age) {
         this.uid = uid;
         this.name = name;
         this.email = email;

@@ -17,7 +17,7 @@ import vn.edu.tlu.cse.lovematch.model.data.User;
 import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
 import vn.edu.tlu.cse.lovematch.R;
 
-public class xSignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     private EditText etEmail, etUsername, etPassword, etConfirmPassword, etResidence;
     private TextView tvWarning;
@@ -151,8 +151,8 @@ public class xSignUpActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 // Lưu thành công, hiển thị thông báo và chuyển sang màn hình chọn giới tính
-                Toast.makeText(xSignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(xSignUpActivity.this, SelectGenderActivity.class);
+                Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SignUpActivity.this, SelectGenderActivity.class);
                 // Xóa các activity trước đó khỏi stack để người dùng không quay lại màn hình đăng ký
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

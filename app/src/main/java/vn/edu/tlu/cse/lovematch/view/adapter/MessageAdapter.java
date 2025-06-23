@@ -16,7 +16,7 @@ import java.util.Locale;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
 
-public class trMessageAdapter extends RecyclerView.Adapter<trMessageAdapter.MessageViewHolder> {
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private static final int VIEW_TYPE_SENT = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
@@ -24,7 +24,7 @@ public class trMessageAdapter extends RecyclerView.Adapter<trMessageAdapter.Mess
     private List<MessageUser> messageList;
     private String currentUserId;
 
-    public trMessageAdapter(List<MessageUser> messageList, String currentUserId) {
+    public MessageAdapter(List<MessageUser> messageList, String currentUserId) {
         this.messageList = messageList;
         this.currentUserId = currentUserId;
     }

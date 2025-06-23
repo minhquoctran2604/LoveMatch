@@ -6,9 +6,7 @@
     android:background="@drawable/background_chat">
 
     <!-- Thanh tiêu đề -->
-
     <!-- Thanh nhập tin nhắn -->
-
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="48dp"
@@ -157,5 +155,4 @@
         android:focusable="false"
         android:importantForAccessibility="no"
         />
-
 </RelativeLayout>

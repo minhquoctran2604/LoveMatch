@@ -8,13 +8,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import vn.edu.tlu.cse.lovematch.model.data.xUser;
+import vn.edu.tlu.cse.lovematch.model.data.User;
 
-public class trChatRepository {
+public class ChatRepository {
 
     private final DatabaseReference userRef;
 
-    public trChatRepository(String userId) {
+    public ChatRepository(String userId) {
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
     }
 
@@ -24,7 +24,7 @@ public class trChatRepository {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    xUser user = snapshot.getValue(xUser.class);
+                    User user = snapshot.getValue(User.class);
                     if (user != null) {
                         listener.onSuccess(user);
                     } else {
@@ -43,7 +43,7 @@ public class trChatRepository {
     }
 
     public interface OnResultListener {
-        void onSuccess(xUser user);
+        void onSuccess(User user);
         void onError(String error);
         void onLoading();
     }

@@ -26,12 +26,12 @@ import com.google.firebase.database.ValueEventListener;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.EditProfileActivity;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.SettingActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.PhotoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class trProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
     private ImageView backArrow;
     private ImageView settingsIcon;
@@ -41,7 +41,7 @@ public class trProfileFragment extends Fragment {
     private GridView photoGrid;
     private DatabaseReference userRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private PhotoAdapter photoAdapter;
 
     @Nullable
     @Override
@@ -58,7 +58,7 @@ public class trProfileFragment extends Fragment {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
 
-        photoAdapter = new trPhotoAdapter(getContext(), photoUrls);
+        photoAdapter = new PhotoAdapter(getContext(), photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         loadUserProfile();

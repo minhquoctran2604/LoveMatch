@@ -21,13 +21,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.PhotoAdapter;
 import vn.edu.tlu.cse.lovematch.R;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class trEditPhotosActivity extends AppCompatActivity {
+public class EditPhotosActivity extends AppCompatActivity {
 
     private ImageView backArrow;
     private ImageView settingsIcon;
@@ -38,7 +38,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
     private DatabaseReference userRef;
     private StorageReference storageRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private PhotoAdapter photoAdapter;
     private int selectedPosition = -1; // Vị trí ảnh được chọn để xóa
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
@@ -61,7 +61,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference().child("user_photos").child(userId);
 
         // Khởi tạo GridView adapter
-        photoAdapter = new trPhotoAdapter(this, photoUrls);
+        photoAdapter = new PhotoAdapter(this, photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         // Lấy danh sách ảnh từ Firebase
@@ -89,7 +89,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
         settingsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(trEditPhotosActivity.this, xSettingActivity.class);
+                Intent intent = new Intent(EditPhotosActivity.this, SettingActivity.class);
                 startActivity(intent);
             }
         });
@@ -112,7 +112,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
                     deletePhoto(selectedPosition);
                     selectedPosition = -1; // Reset vị trí đã chọn
                 } else {
-                    Toast.makeText(trEditPhotosActivity.this, "Vui lòng chọn một ảnh để xóa", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditPhotosActivity.this, "Vui lòng chọn một ảnh để xóa", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -122,7 +122,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedPosition = position;
-                Toast.makeText(trEditPhotosActivity.this, "Đã chọn ảnh số " + (position + 1), Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditPhotosActivity.this, "Đã chọn ảnh số " + (position + 1), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -151,7 +151,7 @@ public class trEditPhotosActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(trEditPhotosActivity.this, "Lỗi khi tải ảnh: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditPhotosActivity.this, "Lỗi khi tải ảnh: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -169,11 +169,11 @@ public class trEditPhotosActivity extends AppCompatActivity {
                         String downloadUrl = uri.toString();
                         photoUrls.add(downloadUrl);
                         photoAdapter.notifyDataSetChanged();
-                        Toast.makeText(trEditPhotosActivity.this, "Thêm ảnh thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditPhotosActivity.this, "Thêm ảnh thành công", Toast.LENGTH_SHORT).show();
                     });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(trEditPhotosActivity.this, "Lỗi khi tải ảnh lên: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditPhotosActivity.this, "Lỗi khi tải ảnh lên: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -188,10 +188,10 @@ public class trEditPhotosActivity extends AppCompatActivity {
             StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(photoUrl);
             photoRef.delete()
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(trEditPhotosActivity.this, "Xóa ảnh thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditPhotosActivity.this, "Xóa ảnh thành công", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(trEditPhotosActivity.this, "Lỗi khi xóa ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditPhotosActivity.this, "Lỗi khi xóa ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
     }
@@ -200,11 +200,11 @@ public class trEditPhotosActivity extends AppCompatActivity {
         // Lưu danh sách ảnh mới lên Firebase Realtime Database
         userRef.child("photos").setValue(photoUrls)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(trEditPhotosActivity.this, "Cập nhật ảnh thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditPhotosActivity.this, "Cập nhật ảnh thành công", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(trEditPhotosActivity.this, "Lỗi khi lưu ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditPhotosActivity.this, "Lỗi khi lưu ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

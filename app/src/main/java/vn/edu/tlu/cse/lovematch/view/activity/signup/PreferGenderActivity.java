@@ -8,12 +8,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.button.MaterialButton;
-import vn.edu.tlu.cse.lovematch.model.repository.xUserRepository;
+import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
 import vn.edu.tlu.cse.lovematch.R;
 
-public class xPreferGenderActivity extends AppCompatActivity {
+public class PreferGenderActivity extends AppCompatActivity {
 
-    private xUserRepository userRepository;
+    private UserRepository userRepository;
     private MaterialButton btnAll;
     private MaterialButton btnMale;
     private MaterialButton btnFemale;
@@ -30,7 +30,7 @@ public class xPreferGenderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prefer_gender);
 
-        userRepository = new xUserRepository();
+        userRepository = new UserRepository();
 
         btnAll = findViewById(R.id.all_button);
         btnMale = findViewById(R.id.male_button);
@@ -70,16 +70,16 @@ public class xPreferGenderActivity extends AppCompatActivity {
                 btnMale.setEnabled(false);
                 btnFemale.setEnabled(false);
 
-                userRepository.updateUserField("preferredGender", selectedPreferredGender, new xUserRepository.OnUserActionListener() {
+                userRepository.updateUserField("preferredGender", selectedPreferredGender, new UserRepository.OnUserActionListener() {
                     @Override
                     public void onSuccess() {
-                        Intent intent = new Intent(xPreferGenderActivity.this, vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity.class);
+                        Intent intent = new Intent(PreferGenderActivity.this, vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity.class);
                         startActivity(intent);
                     }
 
                     @Override
                     public void onFailure(String errorMessage) {
-                        Toast.makeText(xPreferGenderActivity.this, "Lỗi khi cập nhật giới tính ưa thích: " + errorMessage, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PreferGenderActivity.this, "Lỗi khi cập nhật giới tính ưa thích: " + errorMessage, Toast.LENGTH_SHORT).show();
                         btnNext.setEnabled(true);
                         btnAll.setEnabled(true);
                         btnMale.setEnabled(true);

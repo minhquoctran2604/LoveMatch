@@ -13,15 +13,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.data.xUser;
-import vn.edu.tlu.cse.lovematch.model.repository.xUserRepository;
+import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
 
-public class xSelectGenderActivity extends AppCompatActivity {
+public class SelectGenderActivity extends AppCompatActivity {
 
     private RadioGroup genderRadioGroup;
     private Button confirmButton;
     private FirebaseUser currentUser;
-    private xUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,7 @@ public class xSelectGenderActivity extends AppCompatActivity {
             return;
         }
 
-        userRepository = new xUserRepository();
+        userRepository = new UserRepository();
 
         // Khởi tạo các view
         genderRadioGroup = findViewById(R.id.gender_radio_group);
@@ -56,19 +55,19 @@ public class xSelectGenderActivity extends AppCompatActivity {
     }    private void updateUserGender(String gender) {
         Toast.makeText(this, "Đang cập nhật giới tính...", Toast.LENGTH_SHORT).show();
         
-        userRepository.updateUserField("gender", gender, new xUserRepository.OnUserActionListener() {
+        userRepository.updateUserField("gender", gender, new UserRepository.OnUserActionListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(xSelectGenderActivity.this, "Đã chọn giới tính: " + gender, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectGenderActivity.this, "Đã chọn giới tính: " + gender, Toast.LENGTH_SHORT).show();
                 // Chuyển đến activity tiếp theo - chọn giới tính ưa thích
-                Intent intent = new Intent(xSelectGenderActivity.this, xPreferGenderActivity.class);
+                Intent intent = new Intent(SelectGenderActivity.this, PreferGenderActivity.class);
                 startActivity(intent);
                 finish();
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                Toast.makeText(xSelectGenderActivity.this, "Lỗi khi cập nhật giới tính: " + errorMessage, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectGenderActivity.this, "Lỗi khi cập nhật giới tính: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }

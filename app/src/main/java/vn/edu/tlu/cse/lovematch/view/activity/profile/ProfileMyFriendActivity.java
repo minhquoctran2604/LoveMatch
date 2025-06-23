@@ -19,12 +19,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.PhotoAdapter;
 import vn.edu.tlu.cse.lovematch.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class trProfileMyFriendActivity extends AppCompatActivity {
+public class ProfileMyFriendActivity extends AppCompatActivity {
 
     private ImageView backArrow;
     private ImageView avatarImage;
@@ -34,7 +34,7 @@ public class trProfileMyFriendActivity extends AppCompatActivity {
     private GridView photoGrid;
     private DatabaseReference userRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private PhotoAdapter photoAdapter;
     private String friendId;
 
     @Override
@@ -65,7 +65,7 @@ public class trProfileMyFriendActivity extends AppCompatActivity {
 
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(friendId);
 
-        photoAdapter = new trPhotoAdapter(this, photoUrls);
+        photoAdapter = new PhotoAdapter(this, photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         loadFriendProfile();
@@ -116,7 +116,7 @@ public class trProfileMyFriendActivity extends AppCompatActivity {
 
                     // Hiển thị ảnh đại diện
                     if (avatarUrl != null) {
-                        Glide.with(trProfileMyFriendActivity.this)
+                        Glide.with(ProfileMyFriendActivity.this)
                                 .load(avatarUrl)
                                 .placeholder(R.drawable.gai1)
                                 .error(R.drawable.gai1)
@@ -127,13 +127,13 @@ public class trProfileMyFriendActivity extends AppCompatActivity {
 
                     photoAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(trProfileMyFriendActivity.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileMyFriendActivity.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(trProfileMyFriendActivity.this, "Lỗi khi tải thông tin: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileMyFriendActivity.this, "Lỗi khi tải thông tin: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -164,14 +164,14 @@ public class trProfileMyFriendActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     matchesRef.child(friendId).child(currentUserId).removeValue()
                             .addOnSuccessListener(aVoid2 -> {
-                                Toast.makeText(trProfileMyFriendActivity.this, "Đã hủy ghép đôi", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(trProfileMyFriendActivity.this, MainActivity.class);
+                                Toast.makeText(ProfileMyFriendActivity.this, "Đã hủy ghép đôi", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(ProfileMyFriendActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(trProfileMyFriendActivity.this, "Lỗi khi hủy ghép đôi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileMyFriendActivity.this, "Lỗi khi hủy ghép đôi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }
