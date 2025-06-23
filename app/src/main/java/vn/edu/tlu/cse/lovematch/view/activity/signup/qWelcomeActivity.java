@@ -19,9 +19,8 @@ import vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity;
 import android.animation.ObjectAnimator;
 import java.util.Random;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class qWelcomeActivity extends AppCompatActivity {
     private static final String TAG = "WelcomeActivity";
-
     private Button btnSignUp;
     private Button btnLogin;
     private FirebaseAuth auth;
@@ -81,13 +80,13 @@ public class WelcomeActivity extends AppCompatActivity {
         // Xử lý sự kiện nhấn nút "Đăng ký"
         btnSignUp.setOnClickListener(v -> {
             Log.d(TAG, "btnSignUp clicked: Navigating to SignUpActivity");
-            startActivity(new Intent(WelcomeActivity.this, SignUpActivity.class));
+            startActivity(new Intent(qWelcomeActivity.this, qSignUpActivity.class));
         });
 
         // Xử lý sự kiện nhấn nút "Đăng nhập"
         btnLogin.setOnClickListener(v -> {
             Log.d(TAG, "btnLogin clicked: Navigating to SignInActivity");
-            startActivity(new Intent(WelcomeActivity.this, SignInActivity.class));
+            startActivity(new Intent(qWelcomeActivity.this, qSignInActivity.class));
         });
     }
 

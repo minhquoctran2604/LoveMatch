@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class EditPhotosActivity extends AppCompatActivity {
+public class qEditPhotosActivity extends AppCompatActivity {
 
     private ImageView backArrow;
     private ImageView settingsIcon;
@@ -89,7 +89,7 @@ public class EditPhotosActivity extends AppCompatActivity {
         settingsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EditPhotosActivity.this, SettingActivity.class);
+                Intent intent = new Intent(qEditPhotosActivity.this, qSettingActivity.class);
                 startActivity(intent);
             }
         });
@@ -112,7 +112,7 @@ public class EditPhotosActivity extends AppCompatActivity {
                     deletePhoto(selectedPosition);
                     selectedPosition = -1; // Reset vị trí đã chọn
                 } else {
-                    Toast.makeText(EditPhotosActivity.this, "Vui lòng chọn một ảnh để xóa", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(qEditPhotosActivity.this, "Vui lòng chọn một ảnh để xóa", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -122,7 +122,7 @@ public class EditPhotosActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedPosition = position;
-                Toast.makeText(EditPhotosActivity.this, "Đã chọn ảnh số " + (position + 1), Toast.LENGTH_SHORT).show();
+                Toast.makeText(qEditPhotosActivity.this, "Đã chọn ảnh số " + (position + 1), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -151,7 +151,7 @@ public class EditPhotosActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EditPhotosActivity.this, "Lỗi khi tải ảnh: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(qEditPhotosActivity.this, "Lỗi khi tải ảnh: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -169,11 +169,11 @@ public class EditPhotosActivity extends AppCompatActivity {
                         String downloadUrl = uri.toString();
                         photoUrls.add(downloadUrl);
                         photoAdapter.notifyDataSetChanged();
-                        Toast.makeText(EditPhotosActivity.this, "Thêm ảnh thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(qEditPhotosActivity.this, "Thêm ảnh thành công", Toast.LENGTH_SHORT).show();
                     });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(EditPhotosActivity.this, "Lỗi khi tải ảnh lên: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(qEditPhotosActivity.this, "Lỗi khi tải ảnh lên: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -188,10 +188,10 @@ public class EditPhotosActivity extends AppCompatActivity {
             StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(photoUrl);
             photoRef.delete()
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(EditPhotosActivity.this, "Xóa ảnh thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(qEditPhotosActivity.this, "Xóa ảnh thành công", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(EditPhotosActivity.this, "Lỗi khi xóa ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(qEditPhotosActivity.this, "Lỗi khi xóa ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
     }
@@ -200,11 +200,11 @@ public class EditPhotosActivity extends AppCompatActivity {
         // Lưu danh sách ảnh mới lên Firebase Realtime Database
         userRef.child("photos").setValue(photoUrls)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(EditPhotosActivity.this, "Cập nhật ảnh thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(qEditPhotosActivity.this, "Cập nhật ảnh thành công", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(EditPhotosActivity.this, "Lỗi khi lưu ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(qEditPhotosActivity.this, "Lỗi khi lưu ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
-import vn.edu.tlu.cse.lovematch.model.data.User;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.ProfileMyFriendActivity;
 import vn.edu.tlu.cse.lovematch.view.adapter.MessageAdapter;
 import vn.edu.tlu.cse.lovematch.controller.ChatController;

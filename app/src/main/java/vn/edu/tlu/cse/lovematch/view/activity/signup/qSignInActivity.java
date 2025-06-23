@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity;
 
-public class SignInActivity extends AppCompatActivity {
+public class qSignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInActivity";
 
@@ -74,7 +74,7 @@ public class SignInActivity extends AppCompatActivity {
         signUpPrompt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SignInActivity.this, SignUpActivity.class));
+                startActivity(new Intent(qSignInActivity.this, qSignUpActivity.class));
             }
         });
     }
@@ -122,9 +122,9 @@ public class SignInActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Đăng nhập thành công
                             Log.d(TAG, "signInWithEmail:success");
-                            Toast.makeText(SignInActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(qSignInActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                             warningTextView.setVisibility(View.GONE);
-                            startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                            startActivity(new Intent(qSignInActivity.this, MainActivity.class));
                             finish();
                         } else {
                             // Đăng nhập thất bại

@@ -10,7 +10,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 import vn.edu.tlu.cse.lovematch.model.data.MessageUser;
-import vn.edu.tlu.cse.lovematch.model.data.User;
 import vn.edu.tlu.cse.lovematch.model.repository.ChatRepository;
 import vn.edu.tlu.cse.lovematch.view.fragment.ChatUserFragment;
 
@@ -35,7 +34,7 @@ public class ChatController {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
+                    qUser user = snapshot.getValue(qUser.class);
                     if (user != null && user.getPhotos() != null && !user.getPhotos().isEmpty()) {
                         currentUserImage = user.getPhotos().get(0);
                     }

@@ -1,126 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_signin">
+    android:background="@drawable/background_profile"
+    tools:context=".view.activity.signup.qSignInActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:paddingHorizontal="40dp">
+    <!-- Logo và tiêu đề -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="90dp"
+        android:layout_height="71dp"
+        android:layout_marginTop="150dp"
+        android:src="@mipmap/ic_launcher"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Tiêu đề "Đăng nhập" -->
-        <TextView
-            android:id="@+id/sign_in_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/sign_in"
-            android:textColor="@android:color/black"
-            android:textSize="32sp"
-            android:textStyle="bold" />
-
-        <!-- Dòng chữ cảnh báo -->
-        <TextView
-            android:id="@+id/warning_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif"
-            android:text=""
-            android:textColor="#FF0000"
-            android:textSize="12sp"
-            android:visibility="gone"
-            android:gravity="center_horizontal"/>            
-
-        <!-- TextInputLayout cho "Tài khoản/Email" -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/username_input_layout"
-            android:layout_width="280dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/edit_text_background"
-            android:elevation="4dp"
-            app:boxBackgroundMode="none"
-            app:endIconDrawable="@drawable/ic_person"
-            app:endIconMode="custom"
-            app:hintEnabled="false">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/username_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:fontFamily="sans-serif-medium"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:textColor="@android:color/black"
-            android:textColorHint="#A0A0A0"
-            android:textSize="16sp" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- TextInputLayout cho "Mật khẩu" -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/password_input_layout"
-        android:layout_width="280dp"
+    <TextView
+        android:id="@+id/app_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/edit_text_background"
-        android:elevation="4dp"
-        app:boxBackgroundMode="none"
-        app:hintEnabled="false"
-        app:passwordToggleEnabled="true">
+        android:text="LOVE MATCH"
+        android:textColor="#E45C81"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/password_input"
+    <!-- Card chứa form đăng nhập -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/signin_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="48dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_title">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:fontFamily="sans-serif-medium"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:textColor="@android:color/black"
-            android:textColorHint="#A0A0A0"
-            android:textSize="16sp" />
+            android:orientation="vertical"
+            android:padding="32dp">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"
+                android:text="ĐĂNG NHẬP"
+                android:textColor="#3B394A"
+                android:textSize="24sp"
+                android:textStyle="bold" />            <!-- Email Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:startIconDrawable="@drawable/ic_email"
+                app:endIconMode="custom">
 
-    <!-- Nút "Đăng nhập" -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="280dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="#C87DD7"
-        android:elevation="4dp"
-        android:fontFamily="sans-serif-medium"
-        android:paddingHorizontal="35dp"
-        android:paddingVertical="12dp"
-        android:text="@string/sign_in"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        app:cornerRadius="50dp" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/username_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:paddingStart="40dp"
+                    android:paddingEnd="16dp" />
 
-    <!-- Dòng chữ "Chưa có tài khoản? Đăng ký ngay" -->
+            </com.google.android.material.textfield.TextInputLayout><!-- Password Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mật khẩu"
+                    android:inputType="textPassword"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Warning text -->
+            <TextView
+                android:id="@+id/warning_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="#FF5722"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <!-- Sign In Button -->
+            <Button
+                android:id="@+id/sign_in_button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="#E45C81"
+                android:text="ĐĂNG NHẬP"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Sign Up Prompt -->
     <TextView
         android:id="@+id/sign_up_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/no_account_sign_up"
-        android:textColor="@android:color/white"
-        android:textSize="12sp" />
+        android:layout_marginTop="24dp"
+        android:text="Chưa có tài khoản? ĐĂNG KÝ ngay"
+        android:textColor="#717086"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signin_card" />
 
-        </LinearLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import vn.edu.tlu.cse.lovematch.model.data.Notification;
-import vn.edu.tlu.cse.lovematch.model.data.User;
 
 public class NotificationRepository {
 

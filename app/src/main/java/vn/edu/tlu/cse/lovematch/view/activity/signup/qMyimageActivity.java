@@ -25,15 +25,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
+import vn.edu.tlu.cse.lovematch.model.repository.qUserRepository;
 
-public class MyimageActivity extends AppCompatActivity {
+public class qMyimageActivity extends AppCompatActivity {
 
     private static final String TAG = "MyImageActivity";
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
     private ImageView selectedPhotoPreview;
-    private UserRepository userRepository;
+    private qUserRepository qUserRepository;
     private StorageReference storageRef;
     private ActivityResultLauncher<String> pickImageLauncher;
     private ActivityResultLauncher<Intent> takePictureLauncher;
@@ -44,7 +44,7 @@ public class MyimageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myimage);
 
-        userRepository = new UserRepository();
+        qUserRepository = new qUserRepository();
         storageRef = FirebaseStorage.getInstance().getReference("user_photos");
 
         selectedPhotoPreview = findViewById(R.id.selected_photo_preview);
@@ -160,7 +160,7 @@ public class MyimageActivity extends AppCompatActivity {
     }
 
     private void goToNextActivity() {
-        Intent intent = new Intent(MyimageActivity.this, MapActivity.class);
+        Intent intent = new Intent(qMyimageActivity.this, qMapActivity.class);
         startActivity(intent);
         finish();
     }

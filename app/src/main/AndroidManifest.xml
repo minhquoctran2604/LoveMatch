@@ -31,7 +31,7 @@
 
         <!-- WelcomeActivity (Màn hình khởi động mới) -->
         <activity
-            android:name=".view.activity.signup.WelcomeActivity"
+            android:name=".view.activity.signup.qWelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,17 +40,18 @@
         </activity>
 
         <activity android:name=".view.activity.main.MainActivity" />
-        <activity android:name=".view.activity.signup.SignInActivity" />
-        <activity android:name=".view.activity.signup.SignUpActivity" />
-        <activity android:name=".view.activity.signup.SelectGenderActivity" />
-        <activity android:name=".view.activity.signup.PreferGenderActivity" />
-        <activity android:name=".view.activity.signup.DateOfBirthActivity" />
-        <activity android:name=".view.activity.signup.MyimageActivity" />
-        <activity android:name=".view.activity.signup.MapActivity" />
-        <activity android:name=".view.activity.profile.SettingActivity" />
-        <activity android:name=".view.activity.profile.EditProfileActivity" />
-        <activity android:name=".view.activity.profile.ProfileMyFriendActivity" />
-        <activity android:name=".view.activity.profile.EditPhotosActivity" />
+        <activity android:name=".view.activity.signup.qSignInActivity" />
+        <activity android:name=".view.activity.signup.qSignUpActivity" />
+        <activity android:name=".view.activity.signup.qSelectGenderActivity" />
+        <activity android:name=".view.activity.signup.qPreferGenderActivity" />
+        <activity android:name=".view.activity.signup.qDateOfBirthActivity" />
+        <activity android:name=".view.activity.signup.qMyimageActivity" />
+        <activity android:name=".view.activity.signup.qMapActivity" />
+        <activity android:name=".view.activity.profile.qSettingActivity" />
+        <activity android:name=".view.activity.profile.qEditProfileActivity" />
+        <activity android:name=".view.activity.profile.qProfileMyFriendActivity" />
+        <activity android:name=".view.activity.profile.qEditPhotosActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="vn.edu.tlu.cse.lovematch.fileprovider"

@@ -10,21 +10,21 @@ import com.google.android.material.button.MaterialButton;
 import java.util.Calendar;
 import java.util.Locale;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.repository.UserRepository;
+import vn.edu.tlu.cse.lovematch.model.repository.qUserRepository;
 
-public class DateOfBirthActivity extends AppCompatActivity {
+public class qDateOfBirthActivity extends AppCompatActivity {
 
     private static final String TAG = "DateOfBirthActivity";
     private DatePicker datePicker;
     private MaterialButton btnNext;
-    private UserRepository userRepository;
+    private qUserRepository qUserRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_date_of_birth);
 
-        userRepository = new UserRepository();
+        qUserRepository = new qUserRepository();
 
         datePicker = findViewById(R.id.date_picker);
         btnNext = findViewById(R.id.next_button);
@@ -63,16 +63,16 @@ public class DateOfBirthActivity extends AppCompatActivity {
 
             btnNext.setEnabled(false);
 
-            userRepository.updateUserField("dob", dateOfBirth, new UserRepository.OnUserActionListener() {
+            qUserRepository.updateUserField("dob", dateOfBirth, new qUserRepository.OnUserActionListener() {
                 @Override
                 public void onSuccess() {
-                    Intent intent = new Intent(DateOfBirthActivity.this, vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity.class);
+                    Intent intent = new Intent(qDateOfBirthActivity.this, vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity.class);
                     startActivity(intent);
                 }
 
                 @Override
                 public void onFailure(String errorMessage) {
-                    Toast.makeText(DateOfBirthActivity.this, "Lỗi khi cập nhật ngày sinh: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(qDateOfBirthActivity.this, "Lỗi khi cập nhật ngày sinh: " + errorMessage, Toast.LENGTH_SHORT).show();
                     btnNext.setEnabled(true);
                 }
             });

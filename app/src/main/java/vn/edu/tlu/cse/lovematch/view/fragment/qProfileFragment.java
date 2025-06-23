@@ -24,14 +24,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.EditProfileActivity;
-import vn.edu.tlu.cse.lovematch.view.activity.profile.SettingActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.PhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.qEditProfileActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.profile.qSettingActivity;
+import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileFragment extends Fragment {
+public class qProfileFragment extends Fragment {
 
     private ImageView backArrow;
     private ImageView settingsIcon;
@@ -69,10 +69,10 @@ public class ProfileFragment extends Fragment {
         });
 
         settingsIcon.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), SettingActivity.class);
+            Intent intent = new Intent(getContext(), qSettingActivity.class);
             startActivity(intent);
         });        editButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), EditProfileActivity.class);
+            Intent intent = new Intent(getContext(), qEditProfileActivity.class);
             startActivity(intent);
         });
 

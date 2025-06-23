@@ -30,7 +30,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Nút Phần vị tìm kiếm -->
+    <!-- Nút Phạm vi tìm kiếm -->
     <Button
         android:id="@+id/location_button"
         android:layout_width="match_parent"
@@ -42,6 +42,31 @@
         android:padding="12dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"/>
+
+    <!-- Textview for location permission status -->
+    <TextView
+        android:id="@+id/location_permission_status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bạn chưa cấp quyền vị trí."
+        android:textSize="14sp"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
+
+    <!-- Button to enable location permission -->
+    <Button
+        android:id="@+id/enable_location_permission_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bật quyền vị trí"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins_bold"
+        android:background="@drawable/button_primary"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"/>
 
     <!-- Nút Đổi mật khẩu -->
     <Button
