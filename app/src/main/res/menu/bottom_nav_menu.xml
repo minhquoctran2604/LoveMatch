@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/swipeFragment"
-        android:icon="@android:drawable/ic_menu_compass"
+        android:icon="@drawable/ic_search"
         android:title="Swipe" />
     <item
         android:id="@+id/likeFragment"
-        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:icon="@drawable/ic_logo_like"
         android:title="Likes" />
     <item
         android:id="@+id/listChatFragment"
-        android:icon="@android:drawable/ic_menu_send"
+        android:icon="@drawable/ic_chat_bubble"
         android:title="Chat" />
     <item
         android:id="@+id/profileFragment"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_account_circle"
         android:title="Profile" />
 </menu>
 

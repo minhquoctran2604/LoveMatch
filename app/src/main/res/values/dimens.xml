@@ -2,4 +2,5 @@
 <resources>
     <dimen name="selected_stroke_width">2dp</dimen>
     <dimen name="default_stroke_width">1dp</dimen>
+    <dimen name="max_message_width">300dp</dimen>
 </resources>
