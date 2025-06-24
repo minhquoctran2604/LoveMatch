@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.qPhotoAdapter;
 import vn.edu.tlu.cse.lovematch.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class qEditPhotosActivity extends AppCompatActivity {
     private DatabaseReference userRef;
     private StorageReference storageRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private qPhotoAdapter photoAdapter;
     private int selectedPosition = -1; // Vị trí ảnh được chọn để xóa
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
@@ -61,7 +61,7 @@ public class qEditPhotosActivity extends AppCompatActivity {
         storageRef = FirebaseStorage.getInstance().getReference().child("user_photos").child(userId);
 
         // Khởi tạo GridView adapter
-        photoAdapter = new trPhotoAdapter(this, photoUrls);
+        photoAdapter = new qPhotoAdapter(this, photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         // Lấy danh sách ảnh từ Firebase

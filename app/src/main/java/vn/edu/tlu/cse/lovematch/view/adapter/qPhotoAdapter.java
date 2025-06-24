@@ -11,12 +11,12 @@ import java.util.List;
 
 import vn.edu.tlu.cse.lovematch.R;
 
-public class trPhotoAdapter extends BaseAdapter {
+public class qPhotoAdapter extends BaseAdapter {
 
     private Context context;
     private List<String> photoUrls;
 
-    public trPhotoAdapter(Context context, List<String> photoUrls) {
+    public qPhotoAdapter(Context context, List<String> photoUrls) {
         this.context = context;
         this.photoUrls = photoUrls;
     }
