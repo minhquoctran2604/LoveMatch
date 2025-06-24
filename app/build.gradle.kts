@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    id("kotlin-kapt") // Sử dụng id thay cho alias để tránh xung đột
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -65,7 +67,6 @@ dependencies {
     implementation(libs.navigation.fragment.v277)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
-    implementation(libs.appcompat.v161)
     implementation(libs.material)
     implementation(libs.glide)
     implementation(libs.annotation)
@@ -74,4 +75,14 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.firebase.messaging)
+
+    // RxJava3 components
+    implementation(libs.rxjava3)
+    implementation(libs.rxandroid3)
+
+    // Room components
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
 }
