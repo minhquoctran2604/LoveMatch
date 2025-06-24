@@ -17,8 +17,9 @@ public class qUser {
 
     public qUser() {}
 
-    // Constructor đầy đủ
-    public qUser(String uid, String name, String email, String gender, String dateOfBirth, String residence, List<String> photos, double latitude, double longitude, String bio, int age) {
+    public qUser(String uid, String name, String email, String gender, String dateOfBirth, 
+                String residence, List<String> photos, double latitude, double longitude, 
+                String bio, int age) {
         this.uid = uid;
         this.name = name;
         this.email = email;
@@ -32,12 +33,11 @@ public class qUser {
         this.age = age;
     }
 
-    // Getters và Setters
+    // Getters and Setters
     public String getUid() { return uid; }
     public void setUid(String uid) { this.uid = uid; }
 
-    // Alias for getUid() to maintain compatibility
-    public String getId() { return uid; }
+    public String getId() { return uid; } // Alias for getUid() to maintain compatibility
     public void setId(String id) { this.uid = id; }
 
     public String getName() { return name; }

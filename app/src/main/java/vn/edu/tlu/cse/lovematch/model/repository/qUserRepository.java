@@ -17,6 +17,11 @@ public class qUserRepository {
         usersReference = database.getReference("users");
     }
 
+    public interface OnUserActionListener {
+        void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
     public void saveUser(qUser user, OnUserActionListener listener) {
         if (user == null || user.getId() == null) {
             listener.onFailure("Thông tin người dùng không hợp lệ");
