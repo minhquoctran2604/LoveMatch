@@ -3,18 +3,21 @@ package vn.edu.tlu.cse.lovematch.view.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import java.util.ArrayList;
 import java.util.List;
 import vn.edu.tlu.cse.lovematch.R;
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
 
 public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.ViewHolder> {
-    private List<User> userList;
+    private List<qUser> userList;
     private double currentLatitude = 0.0;
     private double currentLongitude = 0.0;
 
-    public CardStackAdapter(List<User> userList) {
+    public CardStackAdapter(List<qUser> userList) {
         this.userList = userList != null ? userList : new ArrayList<>();
     }
 
@@ -27,7 +30,7 @@ public class CardStackAdapter extends RecyclerView.Adapter<CardStackAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (position < userList.size()) {
-            User user = userList.get(position);
+            qUser user = userList.get(position);
             holder.nameTextView.setText(user.getName());
             holder.bioTextView.setText(user.getBio() != null ? user.getBio() : "Chưa có tiểu sử");
             // Sử dụng Glide để tải ảnh đầu tiên trong danh sách photos (nếu có)

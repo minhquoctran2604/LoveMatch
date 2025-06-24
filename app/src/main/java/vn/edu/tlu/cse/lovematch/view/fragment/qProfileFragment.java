@@ -26,7 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.qEditProfileActivity;
 import vn.edu.tlu.cse.lovematch.view.activity.profile.qSettingActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.qPhotoAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class qProfileFragment extends Fragment {
     private GridView photoGrid;
     private DatabaseReference userRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private qPhotoAdapter photoAdapter;
 
     @Nullable
     @Override
@@ -58,7 +58,7 @@ public class qProfileFragment extends Fragment {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
 
-        photoAdapter = new trPhotoAdapter(getContext(), photoUrls);
+        photoAdapter = new qPhotoAdapter(getContext(), photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         loadUserProfile();

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +21,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,10 +30,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import vn.edu.tlu.cse.lovematch.R;
 import vn.edu.tlu.cse.lovematch.controller.LikeController;
 import vn.edu.tlu.cse.lovematch.model.data.qUser;
+import vn.edu.tlu.cse.lovematch.databinding.FragmentLikeBinding;
 import vn.edu.tlu.cse.lovematch.view.adapter.UserGridAdapter;
 
 public class LikeFragment extends Fragment {
@@ -50,32 +48,26 @@ public class LikeFragment extends Fragment {
     private static final String KEY_RESIDENCE_FILTER = "residenceFilter";
     private static final String KEY_FILTER_APPLIED = "filterApplied";
 
-    private ImageButton likesTab;
-    private ImageButton likedTab;
-    private ImageButton filterButton;
-    private TextView likesLabel;
-    private TextView likedLabel;
-    private RecyclerView userRecyclerView;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private FragmentLikeBinding binding;
     private UserGridAdapter userAdapter;
     private List<qUser> userList;
     private List<qUser> usersWhoLikedMe;
     private List<qUser> usersILiked;
     private NavController navController;
     private LikeController controller;
-    private double currentLatitude;
-    private double currentLongitude;
-    private boolean isLoading;
-    private boolean isFilterApplied;
-    private boolean isLikesTabSelected;
     private DatabaseReference matchNotificationsRef;
     private ValueEventListener matchListener;
-    private String currentUserId;
+    private double currentLatitude = 0.0;
+    private double currentLongitude = 0.0;
+    private boolean isLikesTabSelected = true;
+    private boolean isFilterApplied = false;
+    private boolean isLoading = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_like, container, false);
+        binding = FragmentLikeBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -83,83 +75,34 @@ public class LikeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(view);
-
-        currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        matchNotificationsRef = FirebaseDatabase.getInstance().getReference("match_notifications").child(currentUserId);
-
-        likesTab = view.findViewById(R.id.likes_tab);
-        likedTab = view.findViewById(R.id.liked_tab);
-        filterButton = view.findViewById(R.id.filter_button);
-        likesLabel = view.findViewById(R.id.likes_label);
-        likedLabel = view.findViewById(R.id.liked_label);
-        userRecyclerView = view.findViewById(R.id.user_recycler_view);
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
-
         userList = new ArrayList<>();
         usersWhoLikedMe = new ArrayList<>();
         usersILiked = new ArrayList<>();
         userAdapter = new UserGridAdapter(userList, this::onUserClicked, currentLatitude, currentLongitude);
-        userRecyclerView.setAdapter(userAdapter);
-        userRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-
-        userRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                if (!isLoading && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
-                    isLoading = true;
-                    controller.loadMoreUsers();
-                }
-            }
-        });
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            clearFilter();
-            controller.onLikesTabClicked();
-            controller.onLikedTabClicked();
-            swipeRefreshLayout.setRefreshing(false);
-        });
-
-        filterButton.setOnClickListener(v -> showFilterDialog());
+        binding.recyclerView.setAdapter(userAdapter);
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         controller = new LikeController(this);
-
         if (savedInstanceState != null) {
             usersWhoLikedMe = savedInstanceState.getParcelableArrayList(KEY_USERS_WHO_LIKED_ME);
             usersILiked = savedInstanceState.getParcelableArrayList(KEY_USERS_I_LIKED);
             isLikesTabSelected = savedInstanceState.getBoolean(KEY_IS_LIKES_TAB_SELECTED, true);
-            isFilterApplied = savedInstanceState.getBoolean(KEY_FILTER_APPLIED, false);
-            Log.d(TAG, "Restored isFilterApplied: " + isFilterApplied);
             controller.applyFilter(
                     savedInstanceState.getDouble(KEY_MAX_DISTANCE, Double.MAX_VALUE),
                     savedInstanceState.getInt(KEY_MIN_AGE, 0),
                     savedInstanceState.getInt(KEY_MAX_AGE, Integer.MAX_VALUE),
                     savedInstanceState.getString(KEY_RESIDENCE_FILTER)
             );
-            if (isLikesTabSelected) {
-                userList = usersWhoLikedMe != null ? new ArrayList<>(usersWhoLikedMe) : new ArrayList<>();
-                controller.onLikesTabClicked();
-            } else {
-                userList = usersILiked != null ? new ArrayList<>(usersILiked) : new ArrayList<>();
-                controller.onLikedTabClicked();
-            }
-            if (userList != null) {
-                userAdapter.updateList(userList);
-            }
+            isFilterApplied = savedInstanceState.getBoolean(KEY_FILTER_APPLIED, false);
+            if (!isLikesTabSelected) controller.onLikedTabClicked();
+            userList = isLikesTabSelected ? usersWhoLikedMe : usersILiked;
+            userAdapter.updateList(userList);
         } else {
-            isLikesTabSelected = true;
+            controller.onLikesTabClicked();
         }
 
-        likesTab.setOnClickListener(v -> controller.onLikesTabClicked());
-        likedTab.setOnClickListener(v -> controller.onLikedTabClicked());
-
-        updateTabSelection(isLikesTabSelected);
-
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        matchNotificationsRef = FirebaseDatabase.getInstance().getReference("match_notifications").child(currentUserId);
         setupMatchListener();
     }
 
@@ -200,7 +143,7 @@ public class LikeFragment extends Fragment {
                             public void onDataChange(@NonNull DataSnapshot userSnapshot) {
                                 qUser otherUser = userSnapshot.getValue(qUser.class);
                                 if (otherUser != null) {
-                                    String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
+                                    String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "Người dùng này";
                                     showMatchDialog(matchedUserName, chatId, otherUser);
                                 }
                                 matchNotificationsRef.child(matchId).removeValue();
@@ -233,8 +176,7 @@ public class LikeFragment extends Fragment {
         Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_filter);
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.copyFrom(dialog.getWindow().getAttributes());
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.WRAP_CONTENT;
         dialog.getWindow().setAttributes(params);
@@ -246,6 +188,11 @@ public class LikeFragment extends Fragment {
         Button applyButton = dialog.findViewById(R.id.apply_filter_button);
         Button clearFilterButton = dialog.findViewById(R.id.clear_filter_button);
 
+        if (applyButton == null || clearFilterButton == null) {
+            Log.e(TAG, "Filter dialog views not found");
+            return;
+        }
+
         applyButton.setOnClickListener(v -> {
             double maxDistance = Double.MAX_VALUE;
             int minAge = 0;
@@ -254,9 +201,7 @@ public class LikeFragment extends Fragment {
 
             try {
                 String distanceStr = distanceFilter.getText().toString().trim();
-                if (!distanceStr.isEmpty()) {
-                    maxDistance = Double.parseDouble(distanceStr);
-                }
+                if (!distanceStr.isEmpty()) maxDistance = Double.parseDouble(distanceStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(getContext(), "Khoảng cách không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
@@ -264,9 +209,7 @@ public class LikeFragment extends Fragment {
 
             try {
                 String minAgeStr = ageMinFilter.getText().toString().trim();
-                if (!minAgeStr.isEmpty()) {
-                    minAge = Integer.parseInt(minAgeStr);
-                }
+                if (!minAgeStr.isEmpty()) minAge = Integer.parseInt(minAgeStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(getContext(), "Tuổi tối thiểu không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
@@ -274,9 +217,7 @@ public class LikeFragment extends Fragment {
 
             try {
                 String maxAgeStr = ageMaxFilter.getText().toString().trim();
-                if (!maxAgeStr.isEmpty()) {
-                    maxAge = Integer.parseInt(maxAgeStr);
-                }
+                if (!maxAgeStr.isEmpty()) maxAge = Integer.parseInt(maxAgeStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(getContext(), "Tuổi tối đa không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
@@ -289,35 +230,27 @@ public class LikeFragment extends Fragment {
         });
 
         clearFilterButton.setOnClickListener(v -> {
-            clearFilter();
-            distanceFilter.setText("");
-            ageMinFilter.setText("");
-            ageMaxFilter.setText("");
-            residenceFilter.setText("");
+            controller.applyFilter(Double.MAX_VALUE, 0, Integer.MAX_VALUE, null);
+            isFilterApplied = false;
+            Log.d(TAG, "Cleared filter - isFilterApplied: " + isFilterApplied);
             dialog.dismiss();
         });
 
         dialog.show();
     }
 
-    private void clearFilter() {
-        controller.applyFilter(Double.MAX_VALUE, 0, Integer.MAX_VALUE, null);
-        isFilterApplied = false;
-        Log.d(TAG, "Cleared filter - isFilterApplied: " + isFilterApplied);
-    }
-
     public void setCurrentLocation(double latitude, double longitude) {
-        this.currentLatitude = latitude;
-        this.currentLongitude = longitude;
-        userAdapter = new UserGridAdapter(userList, this::onUserClicked, currentLatitude, currentLongitude);
-        userRecyclerView.setAdapter(userAdapter);
+        currentLatitude = latitude;
+        currentLongitude = longitude;
+        if (userAdapter != null) {
+            userAdapter = new UserGridAdapter(userList, this::onUserClicked, currentLatitude, currentLongitude);
+            binding.recyclerView.setAdapter(userAdapter);
+        }
     }
 
     public void updateUserList(List<qUser> users) {
         Log.d(TAG, "updateUserList: Updating with " + (users != null ? users.size() : 0) + " users");
-        if (users == null) {
-            users = new ArrayList<>();
-        }
+        if (users == null) users = new ArrayList<>();
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new UserDiffCallback(userList, users));
         userList.clear();
@@ -326,47 +259,95 @@ public class LikeFragment extends Fragment {
         if (isLikesTabSelected) {
             usersWhoLikedMe.clear();
             usersWhoLikedMe.addAll(users);
-            usersILiked.clear();
-            usersILiked.addAll(controller.getUsersILiked());
         } else {
             usersILiked.clear();
             usersILiked.addAll(users);
-            usersWhoLikedMe.clear();
-            usersWhoLikedMe.addAll(controller.getUsersWhoLikedMe());
         }
 
         diffResult.dispatchUpdatesTo(userAdapter);
         isLoading = false;
-        if (users.isEmpty()) {
-            if (isAdded() && getContext() != null) {
-                Toast.makeText(getContext(), "Không có người dùng nào để hiển thị", Toast.LENGTH_SHORT).show();
+        if (users.isEmpty() && isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), "Không có người dùng nào để hiển thị", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void showMatchDialog(String matchedUserName, String chatId, qUser otherUser) {
+        Log.d(TAG, "showMatchDialog: Attempting to show match dialog for user: " + matchedUserName);
+        if (!isAdded() || getContext() == null) {
+            Log.e(TAG, "Cannot show match dialog: Fragment is not attached to an Activity");
+            return;
+        }
+
+        Dialog matchDialog = new Dialog(getContext());
+        matchDialog.setContentView(R.layout.match_dialog);
+
+        TextView matchTitle = matchDialog.findViewById(R.id.match_title);
+        ImageView currentUserImage = matchDialog.findViewById(R.id.current_user_image);
+        ImageView otherUserImage = matchDialog.findViewById(R.id.other_user_image);
+        Button sendMessageButton = matchDialog.findViewById(R.id.send_message_button);
+        Button keepSwipingButton = matchDialog.findViewById(R.id.keep_swiping_button);
+
+        if (matchTitle == null || currentUserImage == null || otherUserImage == null ||
+                sendMessageButton == null || keepSwipingButton == null) {
+            Log.e(TAG, "showMatchDialog: One or more views in match_dialog.xml are null");
+            return;
+        }
+
+        String message = "Bạn và " + matchedUserName + " đã match thành công!";
+        matchTitle.setText(message);
+
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("users").child(currentUserId);
+        currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                qUser currentUser = snapshot.getValue(qUser.class);
+                if (currentUser != null && currentUser.getPhotos() != null && !currentUser.getPhotos().isEmpty()) {
+                    Glide.with(getContext())
+                            .load(currentUser.getPhotos().get(0))
+                            .placeholder(R.drawable.gai1)
+                            .error(R.drawable.gai1)
+                            .into(currentUserImage);
+                } else {
+                    currentUserImage.setImageResource(R.drawable.gai1);
+                }
             }
-        }
-    }
 
-    public void setActionButtons(boolean show, Consumer<qUser> onLikeClicked, Consumer<qUser> onDislikeClicked) {
-        Log.d(TAG, "setActionButtons: show=" + show);
-        userAdapter.setShowActionButtons(show, onLikeClicked, onDislikeClicked);
-    }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error loading current user: " + error.getMessage());
+                currentUserImage.setImageResource(R.drawable.gai1);
+            }
+        });
 
-    public void updateTabSelection(boolean isLikesTab) {
-        Log.d(TAG, "updateTabSelection: isLikesTab=" + isLikesTab);
-        this.isLikesTabSelected = isLikesTab;
-        if (isLikesTab) {
-            likesTab.animate().alpha(1f).setDuration(200).start();
-            likedTab.animate().alpha(0.5f).setDuration(200).start();
-            likesLabel.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-            likedLabel.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-            setActionButtons(true, controller::onLikeUser, controller::onDislikeUser);
-            updateUserList(usersWhoLikedMe);
+        if (otherUser != null && otherUser.getPhotos() != null && !otherUser.getPhotos().isEmpty()) {
+            Glide.with(getContext())
+                    .load(otherUser.getPhotos().get(0))
+                    .placeholder(R.drawable.gai1)
+                    .error(R.drawable.gai1)
+                    .into(otherUserImage);
         } else {
-            likesTab.animate().alpha(0.5f).setDuration(200).start();
-            likedTab.animate().alpha(1f).setDuration(200).start();
-            likesLabel.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-            likedLabel.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-            setActionButtons(false, null, null);
-            updateUserList(usersILiked);
+            otherUserImage.setImageResource(R.drawable.gai1);
         }
+
+        sendMessageButton.setOnClickListener(v -> {
+            Log.d(TAG, "Send message button clicked, navigating to chat with chatId: " + chatId);
+            matchDialog.dismiss();
+            Bundle bundle = new Bundle();
+            bundle.putString("chatId", chatId);
+            if (navController != null) {
+                navController.navigate(R.id.action_likeFragment_to_listChatFragment, bundle);
+            } else {
+                Log.e(TAG, "NavController is null");
+            }
+        });
+
+        keepSwipingButton.setOnClickListener(v -> {
+            Log.d(TAG, "Keep swiping button clicked, dismissing dialog");
+            matchDialog.dismiss();
+        });
+
+        matchDialog.show();
     }
 
     public void showError(String error) {
@@ -377,91 +358,11 @@ public class LikeFragment extends Fragment {
         }
     }
 
-    public NavController getNavController() {
-        return navController;
-    }
-
     private void onUserClicked(qUser user) {
-        controller.onUserClicked(user);
-    }
-
-    public void showMatchDialog(String matchedUserName, String chatId, qUser otherUser) {
-        Log.d(TAG, "showMatchDialog: Attempting to show match dialog for user: " + matchedUserName);
-        try {
-            Dialog matchDialog = new Dialog(getContext());
-            matchDialog.setContentView(R.layout.match_dialog);
-
-            TextView matchTitle = matchDialog.findViewById(R.id.match_title);
-            ImageView currentUserImage = matchDialog.findViewById(R.id.current_user_image);
-            ImageView otherUserImage = matchDialog.findViewById(R.id.other_user_image);
-            Button sendMessageButton = matchDialog.findViewById(R.id.send_message_button);
-            Button keepSwipingButton = matchDialog.findViewById(R.id.keep_swiping_button);
-
-            if (matchTitle == null || currentUserImage == null || otherUserImage == null ||
-                    sendMessageButton == null || keepSwipingButton == null) {
-                Log.e(TAG, "showMatchDialog: One or more views in match_dialog.xml are null");
-                return;
-            }
-
-            String message = "Bạn và " + matchedUserName + " đã match thành công!";
-            matchTitle.setText(message);
-
-            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("users").child(currentUserId);
-            currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    qUser currentUser = snapshot.getValue(qUser.class);
-                    if (currentUser != null && currentUser.getPhotos() != null && !currentUser.getPhotos().isEmpty()) {
-                        Glide.with(getContext())
-                                .load(currentUser.getPhotos().get(0))
-                                .placeholder(R.drawable.gai1)
-                                .error(R.drawable.gai1)
-                                .into(currentUserImage);
-                    } else {
-                        currentUserImage.setImageResource(R.drawable.gai1);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e(TAG, "Error loading current user: " + error.getMessage());
-                    currentUserImage.setImageResource(R.drawable.gai1);
-                }
-            });
-
-            if (otherUser != null && otherUser.getPhotos() != null && !otherUser.getPhotos().isEmpty()) {
-                Glide.with(getContext())
-                        .load(otherUser.getPhotos().get(0))
-                        .placeholder(R.drawable.gai2)
-                        .error(R.drawable.gai2)
-                        .into(otherUserImage);
-            } else {
-                otherUserImage.setImageResource(R.drawable.gai2);
-            }
-
-            sendMessageButton.setOnClickListener(v -> {
-                Log.d(TAG, "Send message button clicked, navigating to chat with chatId: " + chatId);
-                matchDialog.dismiss();
-                Bundle bundle = new Bundle();
-                bundle.putString("chatId", chatId);
-                try {
-                    navController.navigate(R.id.action_likeFragment_to_listChatFragment, bundle);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error navigating to chat: " + e.getMessage());
-                    showError("Lỗi điều hướng: " + e.getMessage());
-                }
-            });
-
-            keepSwipingButton.setOnClickListener(v -> {
-                Log.d(TAG, "Keep swiping button clicked, dismissing dialog");
-                matchDialog.dismiss();
-            });
-
-            Log.d(TAG, "showMatchDialog: Showing dialog");
-            matchDialog.show();
-        } catch (Exception e) {
-            Log.e(TAG, "Error showing match dialog: " + e.getMessage(), e);
-            showError("Lỗi hiển thị dialog match: " + e.getMessage());
+        if (controller != null) {
+            controller.onUserClicked(user);
+        } else {
+            Log.e(TAG, "Controller is null in onUserClicked");
         }
     }
 
@@ -470,8 +371,8 @@ public class LikeFragment extends Fragment {
         private final List<qUser> newList;
 
         UserDiffCallback(List<qUser> oldList, List<qUser> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
+            this.oldList = oldList != null ? oldList : new ArrayList<>();
+            this.newList = newList != null ? newList : new ArrayList<>();
         }
 
         @Override
@@ -493,14 +394,8 @@ public class LikeFragment extends Fragment {
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             qUser oldUser = oldList.get(oldItemPosition);
             qUser newUser = newList.get(newItemPosition);
-
-            String oldName = oldUser.getName() != null ? oldUser.getName() : "";
-            String newName = newUser.getName() != null ? newUser.getName() : "";
-            List<String> oldPhotos = oldUser.getPhotos() != null ? oldUser.getPhotos() : new ArrayList<>();
-            List<String> newPhotos = newUser.getPhotos() != null ? newUser.getPhotos() : new ArrayList<>();
-
-            return oldName.equals(newName) &&
-                    oldPhotos.equals(newPhotos) &&
+            return oldUser.getName() != null && oldUser.getName().equals(newUser.getName()) &&
+                    oldUser.getBio() != null && oldUser.getBio().equals(newUser.getBio()) &&
                     oldUser.getLatitude() == newUser.getLatitude() &&
                     oldUser.getLongitude() == newUser.getLongitude();
         }

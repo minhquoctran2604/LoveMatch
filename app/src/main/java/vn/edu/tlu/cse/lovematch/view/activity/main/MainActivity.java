@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,10 +19,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.view.activity.signup.SignInActivity;
+import vn.edu.tlu.cse.lovematch.view.activity.signup.qSignInActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,13 +44,13 @@ public class MainActivity extends AppCompatActivity {
         // Check if user is logged in
         if (mAuth.getCurrentUser() == null) {
             Log.w(TAG, "onCreate: No user logged in, redirecting to SignInActivity");
-            startActivity(new Intent(this, SignInActivity.class));
+            startActivity(new Intent(this, qSignInActivity.class));
             finish();
             return;
         }
 
-        // Initialize Firebase Database
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        // Initialize Firebase Database for debugging
+        FirebaseDatabase.getInstance().getReference().child("status").setValue("App started at " + System.currentTimeMillis());
 
         // Set up BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean("isLoggedIn", true);
         editor.apply();
 
-        // Set up navigation listener for testing
+        // Set up navigation listener
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.swipeFragment) {
@@ -129,8 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 Log.w(TAG, "onRequestPermissionsResult: Location permission denied");
-                Toast.makeText(this, "Location permission denied. Some features may be limited.",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Location permission denied. Some features may be limited.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -140,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         Log.d(TAG, "onStart: Checking user authentication");
         if (mAuth.getCurrentUser() == null) {
-            startActivity(new Intent(this, SignInActivity.class));
+            startActivity(new Intent(this, qSignInActivity.class));
             finish();
         }
     }

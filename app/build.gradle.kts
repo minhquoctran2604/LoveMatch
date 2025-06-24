@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
-    id("kotlin-kapt") // Sử dụng id thay cho alias để tránh xung đột
+    id("kotlin-kapt")
     id("com.google.devtools.ksp")
 }
 
@@ -17,13 +17,16 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Định nghĩa GEMINI_API_KEY
-        buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
+        )
     }
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true // Thêm dòng này để kích hoạt BuildConfig
+        buildConfig = true
     }
 
     buildTypes {
@@ -33,10 +36,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
+            buildConfigField(
+                "String",
+                "GEMINI_API_KEY",
+                "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
+            )
         }
         debug {
-            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
+            buildConfigField(
+                "String",
+                "GEMINI_API_KEY",
+                "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
+            )
         }
     }
 
@@ -47,42 +58,47 @@ android {
 }
 
 dependencies {
+    // AndroidX Core
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.navigation.fragment)
     implementation(libs.swiperefreshlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.cardview)
+    implementation("androidx.recyclerview:recyclerview:1.3.0")
 
-    // Thêm thư viện CardStackView để hỗ trợ tính năng vuốt
-    implementation(libs.cardstackview)
+    // Navigation Component
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+
+    // Firebase (bom & services)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
-    implementation(libs.navigation.fragment.v277)
-    implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
-    implementation(libs.material)
+    implementation(libs.firebase.messaging)
+
+    // 3rd-party libraries
+    implementation(libs.cardstackview)
     implementation(libs.glide)
     implementation(libs.annotation)
     implementation(libs.play.services.location)
-    implementation(libs.cardview)
     implementation(libs.okhttp)
     implementation(libs.gson)
-    implementation(libs.firebase.messaging)
 
-    // RxJava3 components
+    // RxJava 3
     implementation(libs.rxjava3)
     implementation(libs.rxandroid3)
 
-    // Room components
+    // Room Database
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    // Unit Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }

@@ -5,14 +5,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 import java.util.List;
 import vn.edu.tlu.cse.lovematch.R;
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
 
 public class UserGridAdapter extends RecyclerView.Adapter<UserGridAdapter.ViewHolder> {
-    private List<User> userList;
+    private List<qUser> userList;
+    private final double currentLatitude;
+    private final double currentLongitude;
+    private final OnUserClickListener onUserClickListener;
 
-    public UserGridAdapter(List<User> userList) {
+    public interface OnUserClickListener {
+        void onUserClicked(qUser user);
+    }
+
+    public UserGridAdapter(List<qUser> userList, OnUserClickListener listener, double currentLatitude, double currentLongitude) {
         this.userList = userList != null ? userList : new ArrayList<>();
+        this.onUserClickListener = listener;
+        this.currentLatitude = currentLatitude;
+        this.currentLongitude = currentLongitude;
     }
 
     @Override
@@ -24,15 +36,23 @@ public class UserGridAdapter extends RecyclerView.Adapter<UserGridAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (position < userList.size()) {
-            User user = userList.get(position);
+            qUser user = userList.get(position);
             holder.nameTextView.setText(user.getName());
             holder.bioTextView.setText(user.getBio() != null ? user.getBio() : "Chưa có tiểu sử");
+            if (onUserClickListener != null) {
+                holder.itemView.setOnClickListener(v -> onUserClickListener.onUserClicked(user));
+            }
         }
     }
 
     @Override
     public int getItemCount() {
         return userList != null ? userList.size() : 0;
+    }
+
+    public void updateList(List<qUser> newList) {
+        this.userList = newList != null ? newList : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

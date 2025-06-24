@@ -19,7 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity;
-import vn.edu.tlu.cse.lovematch.view.adapter.trPhotoAdapter;
+import vn.edu.tlu.cse.lovematch.view.adapter.qPhotoAdapter;
 import vn.edu.tlu.cse.lovematch.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class qProfileMyFriendActivity extends AppCompatActivity {
     private GridView photoGrid;
     private DatabaseReference userRef;
     private List<String> photoUrls = new ArrayList<>();
-    private trPhotoAdapter photoAdapter;
+    private qPhotoAdapter photoAdapter;
     private String friendId;
 
     @Override
@@ -65,7 +65,7 @@ public class qProfileMyFriendActivity extends AppCompatActivity {
 
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(friendId);
 
-        photoAdapter = new trPhotoAdapter(this, photoUrls);
+        photoAdapter = new qPhotoAdapter(this, photoUrls);
         photoGrid.setAdapter(photoAdapter);
 
         loadFriendProfile();
