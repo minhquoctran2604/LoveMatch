@@ -1,12 +1,16 @@
 package vn.edu.tlu.cse.lovematch.controller;
 
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,9 +23,6 @@ import com.yuyakaido.android.cardstackview.CardStackView;
 import com.yuyakaido.android.cardstackview.Direction;
 import com.yuyakaido.android.cardstackview.Duration;
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting;
-import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.data.User;
-import vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,8 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import vn.edu.tlu.cse.lovematch.R;
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
+import vn.edu.tlu.cse.lovematch.view.adapter.CardStackAdapter;
+import vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment;
 
 public class SwipeController {
+
     private static final String TAG = "SwipeController";
     private static final int PAGE_SIZE = 10;
 
@@ -46,22 +52,22 @@ public class SwipeController {
     private final DatabaseReference database;
     private final DatabaseReference matchNotificationsRef;
     private final String currentUserId;
-    private final List<User> userList;
+    private final List<qUser> userList;
     private final CardStackAdapter adapter;
     private final CardStackLayoutManager layoutManager;
-    private final Set<String> matchedUserIds;
-    private final Set<String> skippedUserIds;
+    private Set<String> matchedUserIds;
+    private Set<String> skippedUserIds;
     private boolean isSkipButtonPressed;
     private String lastUserId;
     private boolean isLoading;
     private final Stack<SwipeAction> swipeHistory;
-    private User currentUser;
+    private qUser currentUser;
 
     private static class SwipeAction {
-        User user;
+        qUser user;
         Direction direction;
 
-        SwipeAction(User user, Direction direction) {
+        SwipeAction(qUser user, Direction direction) {
             this.user = user;
             this.direction = direction;
         }
@@ -70,7 +76,7 @@ public class SwipeController {
     public SwipeController(SwipeFragment fragment, CardStackView cardStackView, View skipCircle, View likeCircle,
                            ImageButton skipButton, ImageButton likeButton, TextView matchNotificationText,
                            View matchNotificationLayout, NavController navController,
-                           List<User> userList, CardStackAdapter adapter) {
+                           List<qUser> userList, CardStackAdapter adapter) {
         this.fragment = fragment;
         this.cardStackView = cardStackView;
         this.skipCircle = skipCircle;
@@ -82,10 +88,10 @@ public class SwipeController {
         this.navController = navController;
         this.database = FirebaseDatabase.getInstance().getReference();
         this.matchNotificationsRef = database.child("match_notifications");
-        this.currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
-        this.userList = userList != null ? userList : new ArrayList<>();
-        this.adapter = adapter != null ? adapter : new CardStackAdapter(new ArrayList<>());
-        this.layoutManager = new CardStackLayoutManager(fragment.requireContext());
+        this.currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        this.userList = userList;
+        this.adapter = adapter;
+        this.layoutManager = new CardStackLayoutManager(fragment.getContext());
         this.matchedUserIds = new HashSet<>();
         this.skippedUserIds = new HashSet<>();
         this.isSkipButtonPressed = false;
@@ -97,18 +103,14 @@ public class SwipeController {
     }
 
     private void initializeCardStack() {
-        if (cardStackView == null) return;
-
         SwipeAnimationSetting swipeAnimationSetting = new SwipeAnimationSetting.Builder()
                 .setDirection(Direction.Right)
                 .setDuration(Duration.Normal.duration)
                 .build();
         layoutManager.setSwipeAnimationSetting(swipeAnimationSetting);
-        cardStackView.setLayoutManager(layoutManager);
 
         skipButton.setOnClickListener(v -> {
-            if (isLoading || userList.isEmpty()) return;
-            Log.d(TAG, "Skip button clicked: Performing swipe left");
+            Log.d(TAG, "skipButton clicked: Performing swipe left");
             isSkipButtonPressed = true;
             SwipeAnimationSetting setting = new SwipeAnimationSetting.Builder()
                     .setDirection(Direction.Left)
@@ -120,8 +122,7 @@ public class SwipeController {
         });
 
         likeButton.setOnClickListener(v -> {
-            if (isLoading || userList.isEmpty()) return;
-            Log.d(TAG, "Like button clicked: Performing swipe right");
+            Log.d(TAG, "likeButton clicked: Performing swipe right");
             isSkipButtonPressed = false;
             SwipeAnimationSetting setting = new SwipeAnimationSetting.Builder()
                     .setDirection(Direction.Right)
@@ -138,12 +139,16 @@ public class SwipeController {
         userList.clear();
         swipeHistory.clear();
         adapter.notifyDataSetChanged();
-        loadUsers();
     }
 
     public void loadUsers() {
-        if (isLoading || currentUser == null || currentUserId == null) {
-            Log.d(TAG, "loadUsers: Loading or user data unavailable, skipping...");
+        if (isLoading) {
+            Log.d(TAG, "loadUsers: Already loading, skipping...");
+            return;
+        }
+
+        if (currentUser == null) {
+            Log.d(TAG, "loadUsers: currentUser is null, waiting...");
             return;
         }
 
@@ -153,7 +158,8 @@ public class SwipeController {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 matchedUserIds.clear();
                 for (DataSnapshot matchSnapshot : snapshot.getChildren()) {
-                    matchedUserIds.add(matchSnapshot.getKey());
+                    String matchedUserId = matchSnapshot.getKey();
+                    matchedUserIds.add(matchedUserId);
                 }
                 Log.d(TAG, "Matched users: " + matchedUserIds);
 
@@ -164,118 +170,160 @@ public class SwipeController {
                 query.limitToFirst(PAGE_SIZE).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        List<User> newUsers = new ArrayList<>();
-                        boolean hasOtherGender = !snapshot.getChildren().isEmpty() &&
-                                "Khác".equals(snapshot.getChildren().iterator().next().getValue(User.class).getGender());
+                        List<qUser> newUsers = new ArrayList<>();
+                        Log.d(TAG, "Loading users from Firebase...");
+
+                        boolean hasOtherGender = false;
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            qUser user = userSnapshot.getValue(qUser.class);
+                            if (user != null && "Khác".equals(user.getGender())) {
+                                hasOtherGender = true;
+                                break;
+                            }
+                        }
+                        Log.d(TAG, "loadUsers: Has users with gender 'Khác': " + hasOtherGender);
 
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                            User user = userSnapshot.getValue(User.class);
-                            if (isValidUser(user)) {
-                                String currentUserGender = currentUser.getGender();
-                                String userGender = user.getGender();
-                                if (shouldIncludeUser(currentUserGender, userGender, hasOtherGender)) {
-                                    newUsers.add(user);
-                                    Log.d(TAG, "User added: " + user.getName() + ", Gender: " + userGender);
+                            qUser user = userSnapshot.getValue(qUser.class);
+                            if (user != null && !user.getUid().equals(currentUserId)
+                                    && !matchedUserIds.contains(user.getUid())
+                                    && !skippedUserIds.contains(user.getUid())) {
+                                String currentUserGender = currentUser != null ? currentUser.getGender() : null;
+                                String userGender = user != null ? user.getGender() : null;
+                                Log.d(TAG, "Current user gender: " + currentUserGender + ", User: " + (user != null ? user.getName() : "null") + ", Gender: " + userGender);
+
+                                if (currentUserGender != null && userGender != null) {
+                                    if ("Khác".equals(currentUserGender)) {
+                                        if ("Nam".equals(userGender) || "Nữ".equals(userGender)) {
+                                            newUsers.add(user);
+                                            Log.d(TAG, "User added (Khác sees both Nam and Nữ): " + user.getName());
+                                        }
+                                    } else if ("Nữ".equals(currentUserGender)) {
+                                        if (hasOtherGender) {
+                                            if ("Khác".equals(userGender) || "Nam".equals(userGender)) {
+                                                newUsers.add(user);
+                                                Log.d(TAG, "User added (Nữ sees both Khác and Nam): " + user.getName());
+                                            }
+                                        } else {
+                                            if ("Nam".equals(userGender)) {
+                                                newUsers.add(user);
+                                                Log.d(TAG, "User added (Nữ only sees Nam, no Khác available): " + user.getName());
+                                            }
+                                        }
+                                    } else if ("Nam".equals(currentUserGender)) {
+                                        if (hasOtherGender) {
+                                            if ("Nữ".equals(userGender) || "Khác".equals(userGender)) {
+                                                newUsers.add(user);
+                                                Log.d(TAG, "User added (Nam sees both Nữ and Khác): " + user.getName());
+                                            }
+                                        } else {
+                                            if ("Nữ".equals(userGender)) {
+                                                newUsers.add(user);
+                                                Log.d(TAG, "User added (Nam only sees Nữ, no Khác available): " + user.getName());
+                                            }
+                                        }
+                                    } else {
+                                        Log.d(TAG, "User skipped (gender mismatch): " + user.getName());
+                                    }
+                                } else {
+                                    Log.d(TAG, "User skipped (gender null for currentUser or user): " + (user != null ? user.getName() : "null"));
                                 }
+                            } else {
+                                Log.d(TAG, "User skipped: " + (user == null ? "null user" :
+                                        (matchedUserIds.contains(user.getUid()) ? "already matched" :
+                                                (skippedUserIds.contains(user.getUid()) ? "already skipped" : "current user"))));
                             }
                         }
 
-                        updateUserList(newUsers);
+                        if (!newUsers.isEmpty()) {
+                            lastUserId = newUsers.get(newUsers.size() - 1).getUid();
+                            userList.addAll(newUsers);
+                            adapter.notifyDataSetChanged();
+                            fragment.showUsers();
+                            Log.d(TAG, "Loaded " + newUsers.size() + " new users, total: " + userList.size());
+                        } else {
+                            Log.w(TAG, "No users in this page, trying next page...");
+                            if (lastUserId != null) {
+                                loadUsers();
+                            } else if (userList.isEmpty()) {
+                                fragment.showError("Không có người dùng nào để hiển thị");
+                            }
+                        }
                         isLoading = false;
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        handleDatabaseError(error, "Error loading users");
+                        Log.e(TAG, "Error loading users: " + error.getMessage());
+                        fragment.showError("Lỗi tải danh sách người dùng: " + error.getMessage());
+                        isLoading = false;
                     }
                 });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                handleDatabaseError(error, "Error loading matches");
+                Log.e(TAG, "Error loading matches: " + error.getMessage());
+                fragment.showError("Lỗi tải danh sách match: " + error.getMessage());
+                isLoading = false;
             }
         });
     }
 
-    private boolean isValidUser(User user) {
-        return user != null && !user.getUid().equals(currentUserId) &&
-                !matchedUserIds.contains(user.getUid()) &&
-                !skippedUserIds.contains(user.getUid());
-    }
-
-    private boolean shouldIncludeUser(String currentUserGender, String userGender, boolean hasOtherGender) {
-        if (currentUserGender == null || userGender == null) return false;
-
-        if ("Khác".equals(currentUserGender)) {
-            return "Nam".equals(userGender) || "Nữ".equals(userGender);
-        } else if ("Nữ".equals(currentUserGender)) {
-            return hasOtherGender ? ("Khác".equals(userGender) || "Nam".equals(userGender)) : "Nam".equals(userGender);
-        } else if ("Nam".equals(currentUserGender)) {
-            return hasOtherGender ? ("Nữ".equals(userGender) || "Khác".equals(userGender)) : "Nữ".equals(userGender);
-        }
-        return false;
-    }
-
-    private void updateUserList(List<User> newUsers) {
-        if (!newUsers.isEmpty()) {
-            lastUserId = newUsers.get(newUsers.size() - 1).getUid();
-            userList.addAll(newUsers);
-            adapter.notifyDataSetChanged();
-            fragment.showUsers();
-            Log.d(TAG, "Loaded " + newUsers.size() + " new users, total: " + userList.size());
-        } else if (lastUserId != null) {
-            loadUsers();
-        } else if (userList.isEmpty()) {
-            fragment.showError("Không có người dùng nào để hiển thị");
-        }
-    }
-
     private void loadCurrentUser() {
-        if (currentUserId == null) {
-            fragment.showError("Không tìm thấy ID người dùng hiện tại");
-            return;
-        }
         database.child("users").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                currentUser = snapshot.getValue(User.class);
+                currentUser = snapshot.getValue(qUser.class);
                 if (currentUser != null) {
                     Log.d(TAG, "Current user loaded: " + currentUser.getName() + ", Gender: " + currentUser.getGender());
-                    adapter.setCurrentUserLocation(
-                            currentUser.getLatitude(),
-                            currentUser.getLongitude()
-                    );
+                    if (currentUser.isLocationEnabled()) {
+                        adapter.setCurrentUserLocation(currentUser.getLatitude(), currentUser.getLongitude());
+                    } else {
+                        adapter.setCurrentUserLocation(0.0, 0.0);
+                    }
                     loadUsers();
                 } else {
-                    handleDatabaseError(null, "Không tìm thấy thông tin người dùng hiện tại");
+                    Log.e(TAG, "Current user is null");
+                    fragment.showError("Không tìm thấy thông tin người dùng hiện tại");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                handleDatabaseError(error, "Lỗi tải thông tin người dùng");
+                Log.e(TAG, "Error loading current user: " + error.getMessage());
+                fragment.showError("Lỗi tải thông tin người dùng: " + error.getMessage());
             }
         });
     }
 
     public void handleCardSwiped(Direction direction) {
+        Log.d(TAG, "handleCardSwiped: Direction = " + direction.name() + ", isSkipButtonPressed = " + isSkipButtonPressed);
         if (userList.isEmpty()) {
             Log.w(TAG, "User list is empty during swipe");
             return;
         }
 
-        int index = layoutManager.getTopPosition();
+        int topPosition = layoutManager.getTopPosition();
+        int index = topPosition;
+        Log.d(TAG, "handleCardSwiped: topPosition = " + topPosition + ", userList size = " + userList.size());
         if (index < 0 || index >= userList.size()) {
-            Log.e(TAG, "Invalid index: " + index);
+            Log.e(TAG, "Invalid index: " + index + ", topPosition: " + topPosition + ", userList size = " + userList.size());
+            if (topPosition <= 0 && !userList.isEmpty()) {
+                Log.d(TAG, "handleCardSwiped: topPosition is " + topPosition + ", resetting CardStackView");
+                adapter.notifyDataSetChanged();
+                cardStackView.scheduleLayoutAnimation();
+                return;
+            }
             return;
         }
 
-        User otherUser = userList.get(index);
-        Log.d(TAG, "Swiped user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
+        qUser otherUser = userList.get(index);
+        Log.d(TAG, "handleCardSwiped: Swiped user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
 
         if (isSkipButtonPressed) {
             direction = Direction.Left;
+            Log.d(TAG, "handleCardSwiped: Forcing direction to Left because skipButton was pressed");
             isSkipButtonPressed = false;
         }
 
@@ -285,111 +333,127 @@ public class SwipeController {
             fragment.showLikeAnimation();
             likeUser(otherUser);
             checkForMatch(otherUser);
-        } else {
+        } else if (direction == Direction.Left) {
             fragment.showSkipAnimation();
             skippedUserIds.add(otherUser.getUid());
             userList.remove(otherUser);
-            updateLikedBy(otherUser);
-        }
-    }
-
-    private void updateLikedBy(User otherUser) {
-        if (otherUser == null || otherUser.getUid() == null) return;
-        database.child("likes").child(otherUser.getUid()).child(currentUserId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            database.child("likedBy").child(currentUserId).child(otherUser.getUid()).setValue(true);
+            database.child("likes").child(otherUser.getUid()).child(currentUserId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                database.child("likedBy").child(currentUserId).child(otherUser.getUid()).setValue(true)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                Log.d(TAG, "handleCardSwiped: Updated likedBy for user: " + otherUser.getUid());
+                                            } else {
+                                                Log.e(TAG, "handleCardSwiped: Error updating likedBy: " + task.getException().getMessage());
+                                            }
+                                        });
+                            }
+                            userList.remove(otherUser);
+                            adapter.notifyDataSetChanged();
+                            cardStackView.scheduleLayoutAnimation();
                         }
-                        database.child("likes").child(otherUser.getUid()).child(currentUserId).removeValue();
-                        adapter.notifyDataSetChanged();
-                        cardStackView.scheduleLayoutAnimation();
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        handleDatabaseError(error, "Error checking likes");
-                    }
-                });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e(TAG, "Error checking likes: " + error.getMessage());
+                        }
+                    });
+        }
     }
 
     public void undoLastSwipe() {
         if (swipeHistory.isEmpty()) {
-            Toast.makeText(fragment.requireContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "undoLastSwipe: No actions to undo");
+            Toast.makeText(fragment.getContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
             return;
         }
 
         SwipeAction lastAction = swipeHistory.pop();
-        User user = lastAction.user;
+        qUser user = lastAction.user;
         Direction direction = lastAction.direction;
 
         if (direction == Direction.Right) {
             database.child("likes").child(currentUserId).child(user.getUid()).removeValue();
             matchedUserIds.remove(user.getUid());
-        } else {
+        } else if (direction == Direction.Left) {
             skippedUserIds.remove(user.getUid());
         }
 
         userList.add(0, user);
         adapter.notifyDataSetChanged();
         cardStackView.rewind();
-        Toast.makeText(fragment.requireContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
+        Toast.makeText(fragment.getContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
     }
 
-    private void likeUser(User otherUser) {
-        if (otherUser == null || otherUser.getUid() == null) return;
+    private void likeUser(qUser otherUser) {
+        Log.d(TAG, "likeUser: Liking user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
         database.child("likes").child(currentUserId).child(otherUser.getUid()).setValue(true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        database.child("likedBy").child(otherUser.getUid()).child(currentUserId).setValue(true);
+                        Log.d(TAG, "likeUser: Successfully liked user: " + otherUser.getName());
+                        database.child("likedBy").child(otherUser.getUid()).child(currentUserId).setValue(true)
+                                .addOnCompleteListener(likedByTask -> {
+                                    if (likedByTask.isSuccessful()) {
+                                        Log.d(TAG, "likeUser: Successfully updated likedBy for user: " + otherUser.getUid());
+                                    } else {
+                                        Log.e(TAG, "likeUser: Error updating likedBy: " + likedByTask.getException().getMessage());
+                                    }
+                                });
                     } else {
-                        handleDatabaseError(task.getException(), "Lỗi khi thích");
+                        Log.e(TAG, "likeUser: Error liking user: " + task.getException().getMessage());
+                        fragment.showError("Lỗi khi thích: " + task.getException().getMessage());
                     }
                 });
     }
 
-    private void checkForMatch(User otherUser) {
-        if (otherUser == null || otherUser.getUid() == null) return;
+    private void checkForMatch(qUser otherUser) {
+        Log.d(TAG, "checkForMatch: Checking for match with user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
         database.child("likes").child(otherUser.getUid()).child(currentUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.d(TAG, "checkForMatch: Snapshot exists: " + snapshot.exists());
                         if (snapshot.exists()) {
-                            String chatId = createChatId(otherUser.getUid());
-                            saveMatch(otherUser.getUid(), chatId);
-                            fragment.showMatchDialog(otherUser.getName() != null ? otherUser.getName() : "người dùng này", chatId, otherUser);
+                            Log.d(TAG, "Mutual like detected, match successful!");
+                            String chatId = currentUserId.compareTo(otherUser.getUid()) < 0
+                                    ? currentUserId + "_" + otherUser.getUid()
+                                    : otherUser.getUid() + "_" + currentUserId;
+
+                            database.child("matches").child(currentUserId).child(otherUser.getUid()).setValue(true);
+                            database.child("matches").child(otherUser.getUid()).child(currentUserId).setValue(true);
+
+                            database.child("chats").child(chatId).child("participants").child(currentUserId).setValue(true);
+                            database.child("chats").child(chatId).child("participants").child(otherUser.getUid()).setValue(true);
+
+                            database.child("likes").child(currentUserId).child(otherUser.getUid()).removeValue();
+                            database.child("likedBy").child(currentUserId).child(otherUser.getUid()).removeValue();
+                            database.child("likes").child(otherUser.getUid()).child(currentUserId).removeValue();
+                            database.child("likedBy").child(otherUser.getUid()).child(currentUserId).removeValue();
+
+                            String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
+                            Log.d(TAG, "Match successful with user: " + matchedUserName);
+
+                            fragment.showMatchDialog(matchedUserName, chatId, otherUser);
+
                             pushMatchNotification(currentUserId, otherUser.getUid(), chatId);
+
                             matchedUserIds.add(otherUser.getUid());
                             userList.remove(otherUser);
                             adapter.notifyDataSetChanged();
+                        } else {
+                            Log.d(TAG, "No mutual like found with user: " + otherUser.getName());
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        handleDatabaseError(error, "Lỗi kiểm tra match");
+                        Log.e(TAG, "Error checking match: " + error.getMessage());
+                        fragment.showError("Lỗi kiểm tra match: " + error.getMessage());
                     }
                 });
-    }
-
-    private String createChatId(String otherUserId) {
-        return currentUserId.compareTo(otherUserId) < 0
-                ? currentUserId + "_" + otherUserId
-                : otherUserId + "_" + currentUserId;
-    }
-
-    private void saveMatch(String otherUserId, String chatId) {
-        if (otherUserId == null || chatId == null) return;
-        database.child("matches").child(currentUserId).child(otherUserId).setValue(true);
-        database.child("matches").child(otherUserId).child(currentUserId).setValue(true);
-        database.child("chats").child(chatId).child("participants").child(currentUserId).setValue(true);
-        database.child("chats").child(chatId).child("participants").child(otherUserId).setValue(true);
-
-        database.child("likes").child(currentUserId).child(otherUserId).removeValue();
-        database.child("likedBy").child(currentUserId).child(otherUserId).removeValue();
-        database.child("likes").child(otherUserId).child(currentUserId).removeValue();
-        database.child("likedBy").child(otherUserId).child(currentUserId).removeValue();
     }
 
     private void pushMatchNotification(String currentUserId, String otherUserId, String chatId) {
@@ -401,18 +465,11 @@ public class SwipeController {
 
         matchNotificationsRef.child(otherUserId).child(matchId).setValue(notification)
                 .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        handleDatabaseError(task.getException(), "Error pushing match notification");
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "pushMatchNotification: Successfully pushed match notification to user: " + otherUserId);
+                    } else {
+                        Log.e(TAG, "pushMatchNotification: Error pushing match notification: " + task.getException().getMessage());
                     }
                 });
-    }
-
-    private void handleDatabaseError(Exception exception, String message) {
-        String errorMessage = exception != null ? message + ": " + exception.getMessage() : message;
-        Log.e(TAG, errorMessage);
-        if (fragment != null) {
-            fragment.showError(errorMessage);
-        }
-        isLoading = false;
     }
 }

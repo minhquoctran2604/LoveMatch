@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
+    id("kotlin-kapt") // Sử dụng id thay cho alias để tránh xung đột
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -13,6 +16,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Định nghĩa GEMINI_API_KEY
+        buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true // Thêm dòng này để kích hoạt BuildConfig
     }
 
     buildTypes {
@@ -22,6 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
+        }
+        debug {
+            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
         }
     }
 
@@ -36,33 +51,38 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.annotation)
-    implementation(libs.cardview)
+    implementation(libs.navigation.fragment)
+    implementation(libs.swiperefreshlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 
-    // Firebase
+    // Thêm thư viện CardStackView để hỗ trợ tính năng vuốt
+    implementation(libs.cardstackview)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.messaging)
-
-    // Navigation
-    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.fragment.v277)
     implementation(libs.navigation.ui)
-
-    // Glide & Networking
+    implementation(libs.firebase.storage)
+    implementation(libs.material)
     implementation(libs.glide)
+    implementation(libs.annotation)
+    implementation(libs.play.services.location)
+    implementation(libs.cardview)
     implementation(libs.okhttp)
     implementation(libs.gson)
-    implementation(libs.play.services.location)
+    implementation(libs.firebase.messaging)
 
-    // Test
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext)
-    androidTestImplementation(libs.espresso.core)
+    // RxJava3 components
+    implementation(libs.rxjava3)
+    implementation(libs.rxandroid3)
 
-    // CardStackView từ Jitpack
-    implementation("com.github.yuyakaido:CardStackView:2.3.4")
+    // Room components
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
 }

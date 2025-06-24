@@ -7,7 +7,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 import vn.edu.tlu.cse.lovematch.R;
-import vn.edu.tlu.cse.lovematch.model.data.User;
 
 public class UserGridAdapter extends RecyclerView.Adapter<UserGridAdapter.ViewHolder> {
     private List<User> userList;

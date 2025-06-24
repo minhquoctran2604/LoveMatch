@@ -2,16 +2,35 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_swipe">
+    app:startDestination="@id/swipeFragment">
 
     <fragment
-        android:id="@+id/nav_swipe"
+        android:id="@+id/swipeFragment"
         android:name="vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment"
-        android:label="Swipe" />
+        android:label="Swipe" >
+        <action
+            android:id="@+id/action_swipeFragment_to_listChatFragment"
+            app:destination="@id/listChatFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_like"
+        android:id="@+id/likeFragment"
         android:name="vn.edu.tlu.cse.lovematch.view.fragment.LikeFragment"
-        android:label="Likes" />
+        android:label="Like" >
+        <action
+            android:id="@+id/action_likeFragment_to_listChatFragment"
+            app:destination="@id/listChatFragment" />
+        <action
+            android:id="@+id/action_likeFragment_to_profileMyFriendActivity"
+            app:destination="@id/profileMyFriendActivity" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/listChatFragment"
+        android:name="ListChatFragment" />
+
+    <activity
+        android:id="@+id/profileMyFriendActivity"
+        android:name="vn.edu.tlu.cse.lovematch.view.activity.ProfileMyFriendActivity" />
 
 </navigation>

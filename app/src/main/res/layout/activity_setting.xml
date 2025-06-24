@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/background_profile">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cài đặt"
+        android:textSize="24sp"
+        android:fontFamily="@font/poppins_bold"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Nút Bật / Tắt thông báo -->
+    <Button
+        android:id="@+id/notification_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bật / Tắt thông báo"
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins_bold"
+        android:background="@drawable/button_background"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Nút Phạm vi tìm kiếm -->
+    <Button
+        android:id="@+id/location_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Phạm vi tìm kiếm"
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="16sp"
+        android:background="@drawable/button_background"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Textview for location permission status -->
+    <TextView
+        android:id="@+id/location_permission_status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bạn chưa cấp quyền vị trí."
+        android:textSize="14sp"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
+
+    <!-- Button to enable location permission -->
+    <Button
+        android:id="@+id/enable_location_permission_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bật quyền vị trí"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins_bold"
+        android:background="@drawable/button_primary"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"/>
+
+    <!-- Nút Đổi mật khẩu -->
+    <Button
+        android:id="@+id/change_password_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đổi mật khẩu"
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="16sp"
+        android:background="@drawable/button_background"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Nút Đăng xuất -->
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
+        android:fontFamily="@font/poppins_bold"
+        android:textSize="16sp"
+        android:background="@drawable/button_background"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+</LinearLayout>
