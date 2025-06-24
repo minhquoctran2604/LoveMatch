@@ -8,6 +8,7 @@
     <color name="colorPrimary">#FF2D92</color>
     <color name="colorPrimaryDark">#E91E63</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorPink">#BB4C6A</color>
     
     <!-- Additional Colors -->
     <color name="colorSecondary">#C87DD7</color>
