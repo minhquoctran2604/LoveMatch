@@ -2,7 +2,7 @@ package vn.edu.tlu.cse.lovematch.model.data;
 
 import java.util.List;
 
-public class xUser {
+public class qUser {
     private String uid;
     private String name;
     private String email;
@@ -15,13 +15,11 @@ public class xUser {
     private String bio;
     private int age;
 
-    // Constructor mặc định (cần thiết cho Firebase)
-    public xUser() {}
+    public qUser() {}
 
-    // Constructor đầy đủ
-    public xUser(String uid, String name, String email, String gender,
-                 String dateOfBirth, String residence, List<String> photos,
-                 double latitude, double longitude, String bio, int age) {
+    public qUser(String uid, String name, String email, String gender, String dateOfBirth, 
+                String residence, List<String> photos, double latitude, double longitude, 
+                String bio, int age) {
         this.uid = uid;
         this.name = name;
         this.email = email;
@@ -35,9 +33,12 @@ public class xUser {
         this.age = age;
     }
 
-    // Getters và Setters
+    // Getters and Setters
     public String getUid() { return uid; }
     public void setUid(String uid) { this.uid = uid; }
+
+    public String getId() { return uid; } // Alias for getUid() to maintain compatibility
+    public void setId(String id) { this.uid = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

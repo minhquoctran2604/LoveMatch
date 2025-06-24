@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/swipeFragment">
+
+    <!-- SwipeFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/swipeFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment"
+        android:label="SwipeFragment" />
+
+    <!-- LikeFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/likeFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.LikeFragment"
+        android:label="LikeFragment" />
+
+    <!-- ListChatFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/listChatFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.ListChatFragment"
+        android:label="ListChatFragment" />    <!-- ProfileFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.qProfileFragment"
+        android:label="trProfileFragment" />
+
+    <!-- ChatUserFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/chatUserFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.ListChatFragment"
+        android:label="ChatUserFragment" />
+
+    <!-- ChatAIFragment (Placeholder) -->
+    <fragment
+        android:id="@+id/chatAIFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.ListChatFragment"
+        android:label="ChatAIFragment" />
+
+    <!-- SignInActivity (Activity) -->
+    <activity
+        android:id="@+id/signInActivity"
+        android:name="vn.edu.tlu.cse.lovematch.view.activity.auth.SignInActivity"
+        android:label="SignInActivity" />
+
+</navigation>

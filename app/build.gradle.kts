@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.services)
+    id("com.google.gms.google-services")
+    id("kotlin-kapt") // Sử dụng id thay cho alias để tránh xung đột
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -15,12 +17,13 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "GEMINI_API_KEY", "\"YOUR_GEMINI_API_KEY_HERE\"")
+        // Định nghĩa GEMINI_API_KEY
+        buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
     }
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true
+        buildConfig = true // Thêm dòng này để kích hoạt BuildConfig
     }
 
     buildTypes {
@@ -30,10 +33,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "GEMINI_API_KEY", "\"YOUR_GEMINI_API_KEY_HERE\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
         }
         debug {
-            buildConfigField("String", "GEMINI_API_KEY", "\"YOUR_GEMINI_API_KEY_HERE\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\"")
         }
     }
 
@@ -44,41 +47,42 @@ android {
 }
 
 dependencies {
-    // Core Android
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-
-    // Testing
+    implementation(libs.navigation.fragment)
+    implementation(libs.swiperefreshlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // UI Components
+    // Thêm thư viện CardStackView để hỗ trợ tính năng vuốt
     implementation(libs.cardstackview)
-    implementation(libs.cardview)
-    implementation(libs.swiperefreshlayout)
-
-    // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.database)
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.messaging)
-
-    // Navigation
     implementation(libs.navigation.fragment.v277)
     implementation(libs.navigation.ui)
-
-    // Image Loading & Network
+    implementation(libs.firebase.storage)
+    implementation(libs.material)
     implementation(libs.glide)
+    implementation(libs.annotation)
+    implementation(libs.play.services.location)
+    implementation(libs.cardview)
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.firebase.messaging)
 
-    // Location Services
-    implementation(libs.play.services.location)
-    implementation(libs.annotation)
+    // RxJava3 components
+    implementation(libs.rxjava3)
+    implementation(libs.rxandroid3)
+
+    // Room components
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
 }

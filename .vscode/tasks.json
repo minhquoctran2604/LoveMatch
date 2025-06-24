@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "📱 Install & Run on Device",
+			"type": "shell",
+			"command": ".\\gradlew.bat",
+			"args": [
+				"installDebug"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

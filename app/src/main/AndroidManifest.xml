@@ -2,6 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:ignore="CoarseFineLocation" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Quyền thông báo (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,15 +28,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LoveMatch"
         tools:targetApi="31">
+
+        <!-- WelcomeActivity (Màn hình khởi động mới) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".view.activity.signup.qWelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".view.activity.main.MainActivity" />
+        <activity android:name=".view.activity.signup.qSignInActivity" />
+        <activity android:name=".view.activity.signup.qSignUpActivity" />
+        <activity android:name=".view.activity.signup.qSelectGenderActivity" />
+        <activity android:name=".view.activity.signup.qPreferGenderActivity" />
+        <activity android:name=".view.activity.signup.qDateOfBirthActivity" />
+        <activity android:name=".view.activity.signup.qMyimageActivity" />
+        <activity android:name=".view.activity.signup.qMapActivity" />
+        <activity android:name=".view.activity.profile.qSettingActivity" />
+        <activity android:name=".view.activity.profile.qEditProfileActivity" />
+        <activity android:name=".view.activity.profile.qProfileMyFriendActivity" />
+        <activity android:name=".view.activity.profile.qEditPhotosActivity" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="vn.edu.tlu.cse.lovematch.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
     </application>
 
 </manifest>

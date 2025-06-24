@@ -1,3 +1,146 @@
 <resources>
     <string name="app_name">Love Match</string>
+    
+    <!-- Authentication -->
+    <string name="sign_in">Đăng nhập</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="email">Email</string>
+    <string name="username">Tên người dùng</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="no_account_sign_up">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="already_have_account">Đã có tài khoản? Đăng nhập ngay</string>
+    
+    <!-- Navigation -->
+    <string name="swipe">Khám phá</string>
+    <string name="likes">Yêu thích</string>
+    <string name="chat">Trò chuyện</string>
+    <string name="profile">Hồ sơ</string>
+    
+    <!-- Common -->
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+    <string name="save">Lưu</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="delete">Xóa</string>
+    
+    <!-- Profile -->
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="settings">Cài đặt</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="age">Tuổi</string>
+    <string name="location">Vị trí</string>
+    <string name="bio">Giới thiệu</string>
+    
+    <!-- Gender -->
+    <string name="male">Nam</string>
+    <string name="female">Nữ</string>
+    <string name="other">Khác</string>
+    <string name="select_gender">Chọn giới tính của bạn</string>
+    
+    <!-- Messages -->
+    <string name="type_message">Nhập tin nhắn...</string>
+    <string name="send">Gửi</string>
+    
+    <!-- Errors -->
+    <string name="error_invalid_email">Email không hợp lệ</string>
+    <string name="error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="error_passwords_not_match">Mật khẩu không khớp</string>
+    <string name="error_required_field">Trường này là bắt buộc</string>
+    <string name="error_network">Lỗi kết nối mạng</string>
+    <string name="error_login_failed">Đăng nhập thất bại</string>
+    <string name="error_signup_failed">Đăng ký thất bại</string>
+    
+    <!-- More common strings -->
+    <string name="loading">Đang tải...</string>
+    <string name="retry">Thử lại</string>
+    <string name="ok">OK</string>
+    <string name="yes">Có</string>
+    <string name="no">Không</string>
+    <string name="home">Trang chủ</string>
+    <string name="back">Quay lại</string>
+    <string name="next">Tiếp theo</string>
+    <string name="done">Hoàn thành</string>
+    <string name="skip">Bỏ qua</string>
+    <string name="continue_text">Tiếp tục</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="filter">Lọc</string>
+    <string name="sort">Sắp xếp</string>
+    <string name="refresh">Làm mới</string>
+    <string name="upload">Tải lên</string>
+    <string name="download">Tải xuống</string>
+    <string name="share">Chia sẻ</string>
+    <string name="report">Báo cáo</string>
+    <string name="block">Chặn</string>
+    <string name="unblock">Bỏ chặn</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="unfavorite">Bỏ yêu thích</string>
+    <string name="match">Khớp</string>
+    <string name="unmatch">Bỏ khớp</string>
+    <string name="like">Thích</string>
+    <string name="dislike">Không thích</string>
+    <string name="super_like">Siêu thích</string>
+    <string name="boost">Tăng cường</string>
+    <string name="rewind">Quay lại</string>
+    <string name="distance">Khoảng cách</string>
+    <string name="km">km</string>
+    <string name="miles">dặm</string>
+    <string name="online">Trực tuyến</string>
+    <string name="offline">Ngoại tuyến</string>
+    <string name="active">Hoạt động</string>
+    <string name="inactive">Không hoạt động</string>
+    <string name="verified">Đã xác thực</string>
+    <string name="unverified">Chưa xác thực</string>
+    <string name="premium">Cao cấp</string>
+    <string name="free">Miễn phí</string>
+    <string name="subscription">Đăng ký</string>
+    <string name="upgrade">Nâng cấp</string>
+    <string name="downgrade">Hạ cấp</string>
+    <string name="trial">Dùng thử</string>
+    <string name="expired">Hết hạn</string>
+    <string name="renew">Gia hạn</string>
+    <string name="purchase">Mua</string>
+    <string name="refund">Hoàn tiền</string>
+    <string name="payment">Thanh toán</string>
+    <string name="billing">Hóa đơn</string>
+    <string name="history">Lịch sử</string>
+    <string name="statistics">Thống kê</string>
+    <string name="analytics">Phân tích</string>
+    <string name="notifications">Thông báo</string>
+    <string name="privacy">Riêng tư</string>
+    <string name="security">Bảo mật</string>
+    <string name="terms">Điều khoản</string>
+    <string name="policy">Chính sách</string>
+    <string name="about">Giới thiệu</string>
+    <string name="version">Phiên bản</string>
+    <string name="update">Cập nhật</string>
+    <string name="support">Hỗ trợ</string>
+    <string name="contact">Liên hệ</string>
+    <string name="feedback">Phản hồi</string>
+    <string name="rate">Đánh giá</string>
+    <string name="review">Đánh giá</string>
+    <string name="comment">Bình luận</string>
+    <string name="reply">Phản hồi</string>
+    <string name="mention">Đề cập</string>
+    <string name="tag">Gắn thẻ</string>
+    <string name="hashtag">Hashtag</string>
+    <string name="trending">Xu hướng</string>
+    <string name="popular">Phổ biến</string>
+    <string name="recent">Gần đây</string>
+    <string name="recommended">Đề xuất</string>
+    <string name="featured">Nổi bật</string>
+    <string name="new_text">Mới</string>
+    <string name="old">Cũ</string>
+    <string name="today">Hôm nay</string>
+    <string name="yesterday">Hôm qua</string>
+    <string name="tomorrow">Ngày mai</string>
+    <string name="this_week">Tuần này</string>
+    <string name="last_week">Tuần trước</string>
+    <string name="next_week">Tuần sau</string>
+    <string name="this_month">Tháng này</string>
+    <string name="last_month">Tháng trước</string>
+    <string name="next_month">Tháng sau</string>
+    <string name="this_year">Năm nay</string>
+    <string name="last_year">Năm trước</string>
+    <string name="next_year">Năm sau</string>
 </resources>
