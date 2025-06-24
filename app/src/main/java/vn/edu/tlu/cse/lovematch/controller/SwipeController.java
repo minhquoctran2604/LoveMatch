@@ -23,6 +23,7 @@ import com.yuyakaido.android.cardstackview.CardStackView;
 import com.yuyakaido.android.cardstackview.Direction;
 import com.yuyakaido.android.cardstackview.Duration;
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting;
+import com.yuyakaido.android.cardstackview.CardStackListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ import vn.edu.tlu.cse.lovematch.model.data.qUser;
 import vn.edu.tlu.cse.lovematch.view.adapter.CardStackAdapter;
 import vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment;
 
-public class SwipeController {
+public class SwipeController implements CardStackListener {
 
     private static final String TAG = "SwipeController";
     private static final int PAGE_SIZE = 10;
@@ -91,7 +92,7 @@ public class SwipeController {
         this.currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         this.userList = userList;
         this.adapter = adapter;
-        this.layoutManager = new CardStackLayoutManager(fragment.getContext());
+        this.layoutManager = new CardStackLayoutManager(fragment.getContext(), this);
         this.matchedUserIds = new HashSet<>();
         this.skippedUserIds = new HashSet<>();
         this.isSkipButtonPressed = false;
@@ -103,36 +104,9 @@ public class SwipeController {
 
         cardStackView.setLayoutManager(layoutManager);
         cardStackView.setAdapter(adapter);
-        layoutManager.setStackFrom(CardStackLayoutManager.StackFrom.None);
         layoutManager.setVisibleCount(3);
         layoutManager.setTranslationInterval(8.0f);
         layoutManager.setScaleInterval(0.95f);
-        layoutManager.setCardEventListener(new CardStackLayoutManager.CardEventListener() {
-            @Override
-            public void onCardDragging(Direction direction, float ratio) {
-            }
-
-            @Override
-            public void onCardSwiped(Direction direction) {
-                handleCardSwiped(direction);
-            }
-
-            @Override
-            public void onCardRewound() {
-            }
-
-            @Override
-            public void onCardCanceled() {
-            }
-
-            @Override
-            public void onCardAppeared(View view, int position) {
-            }
-
-            @Override
-            public void onCardDisappeared(View view, int position) {
-            }
-        });
     }
 
     private void initializeCardStack() {
@@ -515,4 +489,24 @@ public class SwipeController {
                     }
                 });
     }
+
+    @Override
+    public void onCardDragging(Direction direction, float ratio) {}
+
+    @Override
+    public void onCardSwiped(Direction direction) {
+        handleCardSwiped(direction);
+    }
+
+    @Override
+    public void onCardRewound() {}
+
+    @Override
+    public void onCardCanceled() {}
+
+    @Override
+    public void onCardAppeared(View view, int position) {}
+
+    @Override
+    public void onCardDisappeared(View view, int position) {}
 }

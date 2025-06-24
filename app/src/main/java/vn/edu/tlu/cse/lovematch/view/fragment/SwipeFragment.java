@@ -110,11 +110,12 @@ public class SwipeFragment extends Fragment {
 
     private void playSound() {
         if (getContext() != null) {
-            MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.swipe_sound2);
-            if (mediaPlayer != null) {
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-            }
+            // Nếu bạn có file swipe_sound2.mp3 trong res/raw thì giữ dòng dưới, nếu không thì comment lại
+            // MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.swipe_sound2);
+            // if (mediaPlayer != null) {
+            //     mediaPlayer.start();
+            //     mediaPlayer.setOnCompletionListener(MediaPlayer::release);
+            // }
         }
     }
 }
