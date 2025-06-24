@@ -28,7 +28,7 @@ import vn.edu.tlu.cse.lovematch.model.data.Notification;
 public class ListChatFragment extends Fragment {
     private RecyclerView notificationsRecyclerView;
     private ImageButton chatbotButton;
-    private SwipeRefreshLayout swipeRefreshLayout; // Thêm SwipeRefreshLayout
+    private SwipeRefreshLayout swipeRefreshLayout;
     private List<Notification> notificationList;
     private NotificationAdapter adapter;
     private FirebaseAuth auth;
@@ -129,7 +129,6 @@ public class ListChatFragment extends Fragment {
             controller.onDestroy();
         }
     }
-    // Đặt hàm này bên dưới hàm updateNotifications hoặc ở cuối file fragment
 //    private List<Notification> createDummyNotifications() {
 //        List<Notification> list = new ArrayList<>();
 //

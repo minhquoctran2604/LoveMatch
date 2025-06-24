@@ -6,9 +6,9 @@ public class Notification {
     private String userName; // Tên của người dùng
     private String userImage; // URL hình ảnh của người dùng
     private String lastMessage; // Tin nhắn cuối cùng
-    private String time; // Thời gian thông báo (định dạng chuỗi)
+    private String time; // Thời gian thông báo
     private boolean isUnread; // Trạng thái chưa xem
-    private long timestamp; // Thời gian tạo thông báo (Unix timestamp)
+    private long timestamp; // Thời gian tạo thông báo
 
     public Notification() {
     }

@@ -1,6 +1,5 @@
 package vn.edu.tlu.cse.lovematch.controller;
 
-
 import android.os.Bundle;
 import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
