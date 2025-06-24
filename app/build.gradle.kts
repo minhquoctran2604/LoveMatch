@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.swiperefreshlayout)
     implementation(libs.cardview)
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
 
     // Navigation Component
     implementation(libs.navigation.fragment)

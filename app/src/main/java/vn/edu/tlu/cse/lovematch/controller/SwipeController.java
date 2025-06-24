@@ -100,6 +100,39 @@ public class SwipeController {
         this.swipeHistory = new Stack<>();
         initializeCardStack();
         loadCurrentUser();
+
+        cardStackView.setLayoutManager(layoutManager);
+        cardStackView.setAdapter(adapter);
+        layoutManager.setStackFrom(CardStackLayoutManager.StackFrom.None);
+        layoutManager.setVisibleCount(3);
+        layoutManager.setTranslationInterval(8.0f);
+        layoutManager.setScaleInterval(0.95f);
+        layoutManager.setCardEventListener(new CardStackLayoutManager.CardEventListener() {
+            @Override
+            public void onCardDragging(Direction direction, float ratio) {
+            }
+
+            @Override
+            public void onCardSwiped(Direction direction) {
+                handleCardSwiped(direction);
+            }
+
+            @Override
+            public void onCardRewound() {
+            }
+
+            @Override
+            public void onCardCanceled() {
+            }
+
+            @Override
+            public void onCardAppeared(View view, int position) {
+            }
+
+            @Override
+            public void onCardDisappeared(View view, int position) {
+            }
+        });
     }
 
     private void initializeCardStack() {
@@ -118,7 +151,9 @@ public class SwipeController {
                     .build();
             layoutManager.setSwipeAnimationSetting(setting);
             cardStackView.swipe();
-            fragment.showSkipAnimationOnButton(skipButton);
+            if (fragment.isAdded()) {
+                fragment.showSkipAnimationOnButton(skipButton);
+            }
         });
 
         likeButton.setOnClickListener(v -> {
@@ -130,7 +165,9 @@ public class SwipeController {
                     .build();
             layoutManager.setSwipeAnimationSetting(setting);
             cardStackView.swipe();
-            fragment.showLikeAnimationOnButton(likeButton);
+            if (fragment.isAdded()) {
+                fragment.showLikeAnimationOnButton(likeButton);
+            }
         });
     }
 
@@ -142,13 +179,8 @@ public class SwipeController {
     }
 
     public void loadUsers() {
-        if (isLoading) {
-            Log.d(TAG, "loadUsers: Already loading, skipping...");
-            return;
-        }
-
-        if (currentUser == null) {
-            Log.d(TAG, "loadUsers: currentUser is null, waiting...");
+        if (isLoading || currentUser == null) {
+            Log.d(TAG, "loadUsers: Already loading or currentUser is null, skipping...");
             return;
         }
 
@@ -159,7 +191,9 @@ public class SwipeController {
                 matchedUserIds.clear();
                 for (DataSnapshot matchSnapshot : snapshot.getChildren()) {
                     String matchedUserId = matchSnapshot.getKey();
-                    matchedUserIds.add(matchedUserId);
+                    if (matchedUserId != null) {
+                        matchedUserIds.add(matchedUserId);
+                    }
                 }
                 Log.d(TAG, "Matched users: " + matchedUserIds);
 
@@ -188,10 +222,8 @@ public class SwipeController {
                             if (user != null && !user.getUid().equals(currentUserId)
                                     && !matchedUserIds.contains(user.getUid())
                                     && !skippedUserIds.contains(user.getUid())) {
-                                String currentUserGender = currentUser != null ? currentUser.getGender() : null;
-                                String userGender = user != null ? user.getGender() : null;
-                                Log.d(TAG, "Current user gender: " + currentUserGender + ", User: " + (user != null ? user.getName() : "null") + ", Gender: " + userGender);
-
+                                String currentUserGender = currentUser.getGender();
+                                String userGender = user.getGender();
                                 if (currentUserGender != null && userGender != null) {
                                     if ("Khác".equals(currentUserGender)) {
                                         if ("Nam".equals(userGender) || "Nữ".equals(userGender)) {
@@ -222,16 +254,8 @@ public class SwipeController {
                                                 Log.d(TAG, "User added (Nam only sees Nữ, no Khác available): " + user.getName());
                                             }
                                         }
-                                    } else {
-                                        Log.d(TAG, "User skipped (gender mismatch): " + user.getName());
                                     }
-                                } else {
-                                    Log.d(TAG, "User skipped (gender null for currentUser or user): " + (user != null ? user.getName() : "null"));
                                 }
-                            } else {
-                                Log.d(TAG, "User skipped: " + (user == null ? "null user" :
-                                        (matchedUserIds.contains(user.getUid()) ? "already matched" :
-                                                (skippedUserIds.contains(user.getUid()) ? "already skipped" : "current user"))));
                             }
                         }
 
@@ -239,13 +263,15 @@ public class SwipeController {
                             lastUserId = newUsers.get(newUsers.size() - 1).getUid();
                             userList.addAll(newUsers);
                             adapter.notifyDataSetChanged();
-                            fragment.showUsers();
+                            if (fragment.isAdded()) {
+                                fragment.showUsers();
+                            }
                             Log.d(TAG, "Loaded " + newUsers.size() + " new users, total: " + userList.size());
-                        } else {
+                        } else if (lastUserId != null) {
                             Log.w(TAG, "No users in this page, trying next page...");
-                            if (lastUserId != null) {
-                                loadUsers();
-                            } else if (userList.isEmpty()) {
+                            loadUsers();
+                        } else if (userList.isEmpty()) {
+                            if (fragment.isAdded()) {
                                 fragment.showError("Không có người dùng nào để hiển thị");
                             }
                         }
@@ -255,7 +281,9 @@ public class SwipeController {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e(TAG, "Error loading users: " + error.getMessage());
-                        fragment.showError("Lỗi tải danh sách người dùng: " + error.getMessage());
+                        if (fragment.isAdded()) {
+                            fragment.showError("Lỗi tải danh sách người dùng: " + error.getMessage());
+                        }
                         isLoading = false;
                     }
                 });
@@ -264,7 +292,9 @@ public class SwipeController {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Error loading matches: " + error.getMessage());
-                fragment.showError("Lỗi tải danh sách match: " + error.getMessage());
+                if (fragment.isAdded()) {
+                    fragment.showError("Lỗi tải danh sách match: " + error.getMessage());
+                }
                 isLoading = false;
             }
         });
@@ -285,14 +315,18 @@ public class SwipeController {
                     loadUsers();
                 } else {
                     Log.e(TAG, "Current user is null");
-                    fragment.showError("Không tìm thấy thông tin người dùng hiện tại");
+                    if (fragment.isAdded()) {
+                        fragment.showError("Không tìm thấy thông tin người dùng hiện tại");
+                    }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Error loading current user: " + error.getMessage());
-                fragment.showError("Lỗi tải thông tin người dùng: " + error.getMessage());
+                if (fragment.isAdded()) {
+                    fragment.showError("Lỗi tải thông tin người dùng: " + error.getMessage());
+                }
             }
         });
     }
@@ -305,20 +339,12 @@ public class SwipeController {
         }
 
         int topPosition = layoutManager.getTopPosition();
-        int index = topPosition;
-        Log.d(TAG, "handleCardSwiped: topPosition = " + topPosition + ", userList size = " + userList.size());
-        if (index < 0 || index >= userList.size()) {
-            Log.e(TAG, "Invalid index: " + index + ", topPosition: " + topPosition + ", userList size = " + userList.size());
-            if (topPosition <= 0 && !userList.isEmpty()) {
-                Log.d(TAG, "handleCardSwiped: topPosition is " + topPosition + ", resetting CardStackView");
-                adapter.notifyDataSetChanged();
-                cardStackView.scheduleLayoutAnimation();
-                return;
-            }
+        if (topPosition < 0 || topPosition >= userList.size()) {
+            Log.e(TAG, "Invalid index: " + topPosition + ", userList size = " + userList.size());
             return;
         }
 
-        qUser otherUser = userList.get(index);
+        qUser otherUser = userList.get(topPosition);
         Log.d(TAG, "handleCardSwiped: Swiped user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
 
         if (isSkipButtonPressed) {
@@ -330,13 +356,18 @@ public class SwipeController {
         swipeHistory.push(new SwipeAction(otherUser, direction));
 
         if (direction == Direction.Right) {
-            fragment.showLikeAnimation();
+            if (fragment.isAdded()) {
+                fragment.showLikeAnimation();
+            }
             likeUser(otherUser);
             checkForMatch(otherUser);
         } else if (direction == Direction.Left) {
-            fragment.showSkipAnimation();
+            if (fragment.isAdded()) {
+                fragment.showSkipAnimation();
+            }
             skippedUserIds.add(otherUser.getUid());
-            userList.remove(otherUser);
+            userList.remove(topPosition);
+            adapter.notifyDataSetChanged();
             database.child("likes").child(otherUser.getUid()).child(currentUserId)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -351,9 +382,6 @@ public class SwipeController {
                                             }
                                         });
                             }
-                            userList.remove(otherUser);
-                            adapter.notifyDataSetChanged();
-                            cardStackView.scheduleLayoutAnimation();
                         }
 
                         @Override
@@ -362,12 +390,18 @@ public class SwipeController {
                         }
                     });
         }
+
+        if (userList.size() <= 3) {
+            loadUsers();
+        }
     }
 
     public void undoLastSwipe() {
         if (swipeHistory.isEmpty()) {
             Log.d(TAG, "undoLastSwipe: No actions to undo");
-            Toast.makeText(fragment.getContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
+            if (fragment.isAdded()) {
+                Toast.makeText(fragment.getContext(), "Không có hành động để hoàn tác", Toast.LENGTH_SHORT).show();
+            }
             return;
         }
 
@@ -376,8 +410,12 @@ public class SwipeController {
         Direction direction = lastAction.direction;
 
         if (direction == Direction.Right) {
-            database.child("likes").child(currentUserId).child(user.getUid()).removeValue();
-            matchedUserIds.remove(user.getUid());
+            database.child("likes").child(currentUserId).child(user.getUid()).removeValue()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            matchedUserIds.remove(user.getUid());
+                        }
+                    });
         } else if (direction == Direction.Left) {
             skippedUserIds.remove(user.getUid());
         }
@@ -385,7 +423,9 @@ public class SwipeController {
         userList.add(0, user);
         adapter.notifyDataSetChanged();
         cardStackView.rewind();
-        Toast.makeText(fragment.getContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
+        if (fragment.isAdded()) {
+            Toast.makeText(fragment.getContext(), "Đã hoàn tác", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void likeUser(qUser otherUser) {
@@ -404,7 +444,9 @@ public class SwipeController {
                                 });
                     } else {
                         Log.e(TAG, "likeUser: Error liking user: " + task.getException().getMessage());
-                        fragment.showError("Lỗi khi thích: " + task.getException().getMessage());
+                        if (fragment.isAdded()) {
+                            fragment.showError("Lỗi khi thích: " + task.getException().getMessage());
+                        }
                     }
                 });
     }
@@ -415,7 +457,6 @@ public class SwipeController {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Log.d(TAG, "checkForMatch: Snapshot exists: " + snapshot.exists());
                         if (snapshot.exists()) {
                             Log.d(TAG, "Mutual like detected, match successful!");
                             String chatId = currentUserId.compareTo(otherUser.getUid()) < 0
@@ -434,9 +475,9 @@ public class SwipeController {
                             database.child("likedBy").child(otherUser.getUid()).child(currentUserId).removeValue();
 
                             String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
-                            Log.d(TAG, "Match successful with user: " + matchedUserName);
-
-                            fragment.showMatchDialog(matchedUserName, chatId, otherUser);
+                            if (fragment.isAdded()) {
+                                fragment.showMatchDialog(matchedUserName, chatId, otherUser);
+                            }
 
                             pushMatchNotification(currentUserId, otherUser.getUid(), chatId);
 
@@ -451,7 +492,9 @@ public class SwipeController {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e(TAG, "Error checking match: " + error.getMessage());
-                        fragment.showError("Lỗi kiểm tra match: " + error.getMessage());
+                        if (fragment.isAdded()) {
+                            fragment.showError("Lỗi kiểm tra match: " + error.getMessage());
+                        }
                     }
                 });
     }
