@@ -4,75 +4,104 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/background_gradient">
+    android:background="@drawable/background_gradient"
+    android:padding="16dp">
 
+    <!-- Logo Love -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:gravity="center_vertical">
 
-        <!-- Tab "Lượt thích" (những người đã thích bạn) - Đặt bên trái -->
+        <ImageView
+            android:id="@+id/app_logo"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:src="@drawable/logo"
+            android:contentDescription="logo" />
+    </LinearLayout>
+
+    <!-- Thanh tab chọn -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:padding="8dp">
+
+        <!-- Tab "Lượt thích" -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@drawable/bg_tab_button"
+            android:paddingHorizontal="12dp"
+            android:layout_marginEnd="8dp">
 
             <ImageButton
                 android:id="@+id/likes_tab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@android:color/transparent"
                 android:src="@drawable/ic_heart"
-            android:background="@android:color/transparent"/>
+                android:tint="@android:color/white"/>
 
             <TextView
                 android:id="@+id/likes_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lượt thích (Thích tôi)"
+                android:text="Lượt thích"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:layout_marginStart="8dp"/>
-
         </LinearLayout>
 
-        <!-- Tab "Đã thích" (những người bạn đã thích) - Đặt bên phải -->
+        <!-- Tab "Đã thích" -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@drawable/bg_tab_button"
+            android:paddingHorizontal="12dp"
+            android:layout_marginStart="8dp">
 
             <ImageButton
                 android:id="@+id/liked_tab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@android:color/transparent"
                 android:src="@drawable/ic_heart"
-            android:background="@android:color/transparent"/>
+                android:tint="@android:color/white"/>
 
             <TextView
                 android:id="@+id/liked_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đã thích (Tôi thích)"
+                android:text="Đã thích"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:layout_marginStart="8dp"/>
-
         </LinearLayout>
 
+        <!-- Nút filter -->
         <ImageButton
             android:id="@+id/filter_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_filter"
-            android:background="@android:color/transparent"/>
-
+            android:background="@drawable/bg_tab_button"
+            android:tint="@android:color/white"
+            android:layout_marginStart="8dp"/>
     </LinearLayout>
 
+
+    <!-- RecyclerView hiển thị danh sách -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
@@ -82,8 +111,7 @@
             android:id="@+id/user_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"/>
-
+            android:padding="8dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>
