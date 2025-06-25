@@ -2,10 +2,10 @@ package vn.edu.tlu.cse.lovematch.view.fragment;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +69,7 @@ public class nSwipeFragment extends Fragment {
     private DatabaseReference matchNotificationsRef;
     private ValueEventListener matchListener;
     private String currentUserId;
-    private List<qUser> userList;
+    private List<qUser> userList = new ArrayList<>(); // Khởi tạo trực tiếp
     private nCardStackAdapter adapter;
     private CardStackLayoutManager layoutManager;
     private View currentStamp;
@@ -120,8 +120,7 @@ public class nSwipeFragment extends Fragment {
         errorMessage = view.findViewById(R.id.error_message);
         retryButton = view.findViewById(R.id.retry_button);
 
-        userList = new ArrayList<>();
-        adapter = new nCardStackAdapter(userList);
+        adapter = new nCardStackAdapter(userList); // Sử dụng userList đã khởi tạo
 
         layoutManager = new CardStackLayoutManager(getContext(), new CardStackListener() {
             @Override
@@ -275,7 +274,7 @@ public class nSwipeFragment extends Fragment {
                     String chatId = matchSnapshot.child("chatId").getValue(String.class);
 
                     if (otherUserId != null && chatId != null) {
-                        DatabaseReference otherUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(otherUserId); // Sửa thành "qUser"
+                        DatabaseReference otherUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(otherUserId);
                         otherUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot userSnapshot) {
@@ -289,7 +288,7 @@ public class nSwipeFragment extends Fragment {
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
-                                Log.e(TAG, "Error loading matched user: " + error.getMessage());
+                                Log.e(TAG, "setupMatchListener: Error loading matched user: " + error.getMessage());
                                 showError("Lỗi tải thông tin người dùng match: " + error.getMessage());
                             }
                         });
@@ -299,7 +298,7 @@ public class nSwipeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error listening for match notifications: " + error.getMessage());
+                Log.e(TAG, "setupMatchListener: Error listening for match notifications: " + error.getMessage());
                 showError("Lỗi lắng nghe thông báo match: " + error.getMessage());
             }
         };
@@ -336,13 +335,13 @@ public class nSwipeFragment extends Fragment {
                 currentLatitude = location.getLatitude();
                 currentLongitude = location.getLongitude();
                 adapter.setCurrentUserLocation(currentLatitude, currentLongitude);
-                Log.d(TAG, "User location: " + currentLatitude + ", " + currentLongitude);
+                Log.d(TAG, "getUserLocation: User location: " + currentLatitude + ", " + currentLongitude);
             } else {
-                Log.w(TAG, "Cannot get user location");
+                Log.w(TAG, "getUserLocation: Cannot get user location");
                 adapter.setCurrentUserLocation(0, 0);
             }
         }).addOnFailureListener(e -> {
-            Log.e(TAG, "Error getting location: " + e.getMessage());
+            Log.e(TAG, "getUserLocation: Error getting location: " + e.getMessage());
             adapter.setCurrentUserLocation(0, 0);
             Toast.makeText(getContext(), "Lỗi lấy vị trí: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
@@ -434,9 +433,11 @@ public class nSwipeFragment extends Fragment {
     }
 
     public void showUsers() {
+        Log.d(TAG, "showUsers: Displaying users, userList size: " + userList.size());
         cardStackView.setVisibility(View.VISIBLE);
         loadingIndicator.setVisibility(View.GONE);
         errorLayout.setVisibility(View.GONE);
+        adapter.notifyDataSetChanged(); // Đảm bảo adapter được cập nhật
     }
 
     public void showMatchDialog(String matchedUserName, String chatId, qUser otherUser) {
@@ -475,7 +476,7 @@ public class nSwipeFragment extends Fragment {
             String message = "Bạn và " + matchedUserName + " đã match thành công!";
             matchTitle.setText(message);
 
-            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(currentUserId); // Sửa thành "qUser"
+            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(currentUserId);
             currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -493,7 +494,7 @@ public class nSwipeFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e(TAG, "Error loading current user: " + error.getMessage());
+                    Log.e(TAG, "showMatchDialog: Error loading current user: " + error.getMessage());
                     currentUserImage.setImageResource(R.drawable.gai1);
                 }
             });
@@ -509,7 +510,7 @@ public class nSwipeFragment extends Fragment {
             }
 
             sendMessageButton.setOnClickListener(v -> {
-                Log.d(TAG, "Send message button clicked, navigating to chat with chatId: " + chatId);
+                Log.d(TAG, "showMatchDialog: Send message button clicked, navigating to chat with chatId: " + chatId);
                 matchDialog.dismiss();
                 Bundle bundle = new Bundle();
                 bundle.putString("userId", otherUser.getUid());
@@ -517,13 +518,13 @@ public class nSwipeFragment extends Fragment {
                 try {
                     navController.navigate(R.id.action_swipeFragment_to_chatUserFragment, bundle);
                 } catch (Exception e) {
-                    Log.e(TAG, "Error navigating to chat: " + e.getMessage());
+                    Log.e(TAG, "showMatchDialog: Error navigating to chat: " + e.getMessage());
                     showError("Lỗi điều hướng: " + e.getMessage());
                 }
             });
 
             keepSwipingButton.setOnClickListener(v -> {
-                Log.d(TAG, "Keep swiping button clicked, dismissing dialog");
+                Log.d(TAG, "showMatchDialog: Keep swiping button clicked, dismissing dialog");
                 matchDialog.dismiss();
                 controller.loadUsers();
             });
@@ -531,7 +532,7 @@ public class nSwipeFragment extends Fragment {
             Log.d(TAG, "showMatchDialog: Showing dialog");
             matchDialog.show();
         } catch (Exception e) {
-            Log.e(TAG, "Error showing match dialog: " + e.getMessage(), e);
+            Log.e(TAG, "showMatchDialog: Error showing match dialog: " + e.getMessage(), e);
             showError("Lỗi hiển thị dialog match: " + e.getMessage());
         }
     }

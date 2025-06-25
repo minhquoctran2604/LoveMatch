@@ -58,15 +58,15 @@ public class nSwipeController {
     private final DatabaseReference database;
     private final DatabaseReference matchNotificationsRef;
     private final String currentUserId;
-    private final List<qUser> userList; // Initialized here
+    private final List<qUser> userList = new ArrayList<>(); // Khởi tạo trực tiếp
     private final nCardStackAdapter adapter;
     private final CardStackLayoutManager layoutManager;
-    private Set<String> matchedUserIds;
-    private Set<String> skippedUserIds;
+    private Set<String> matchedUserIds = new HashSet<>();
+    private Set<String> skippedUserIds = new HashSet<>();
     private boolean isSkipButtonPressed;
     private String lastUserId;
     private boolean isLoading;
-    private final Stack<SwipeAction> swipeHistory;
+    private final Stack<SwipeAction> swipeHistory = new Stack<>();
     private qUser currentUser;
 
     private static class SwipeAction {
@@ -82,7 +82,7 @@ public class nSwipeController {
     public nSwipeController(nSwipeFragment fragment, CardStackView cardStackView, View skipCircle, View likeCircle,
                             ImageButton skipButton, ImageButton likeButton, TextView matchNotificationText,
                             View matchNotificationLayout, NavController navController,
-                            List<qUser> userList, nCardStackAdapter adapter) {
+                            List<qUser> userListParam, nCardStackAdapter adapter) {
         this.fragment = fragment;
         this.cardStackView = cardStackView;
         this.skipCircle = skipCircle;
@@ -97,19 +97,15 @@ public class nSwipeController {
         this.currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                 : null;
-        this.userList = new ArrayList<>(); // Initialize userList here
         if (currentUserId == null) {
             Log.e(TAG, "No current user ID, initialization failed");
             fragment.showError("Không tìm thấy người dùng hiện tại");
         }
         this.adapter = adapter;
         this.layoutManager = new CardStackLayoutManager(fragment.getContext());
-        this.matchedUserIds = new HashSet<>();
-        this.skippedUserIds = new HashSet<>();
         this.isSkipButtonPressed = false;
         this.lastUserId = null;
         this.isLoading = false;
-        this.swipeHistory = new Stack<>();
         initializeCardStack();
         loadCurrentUser();
     }
@@ -165,6 +161,7 @@ public class nSwipeController {
         }
 
         isLoading = true;
+        Log.d(TAG, "loadUsers: Starting to load users for currentUserId: " + currentUserId);
         database.child("matches").child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -175,7 +172,7 @@ public class nSwipeController {
                         matchedUserIds.add(matchedUserId);
                     }
                 }
-                Log.d(TAG, "Matched users: " + matchedUserIds);
+                Log.d(TAG, "loadUsers: Matched users: " + matchedUserIds);
 
                 Query query = database.child("qUser").orderByKey();
                 if (lastUserId != null) {
@@ -185,7 +182,7 @@ public class nSwipeController {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         List<qUser> newUsers = new ArrayList<>();
-                        Log.d(TAG, "Loading users from Firebase (qUser node)...");
+                        Log.d(TAG, "loadUsers: Snapshot size: " + snapshot.getChildrenCount());
 
                         boolean hasOtherGender = false;
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
@@ -199,40 +196,25 @@ public class nSwipeController {
 
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             qUser user = userSnapshot.getValue(qUser.class);
-                            if (user != null && !user.getUid().equals(currentUserId)
-                                    && !matchedUserIds.contains(user.getUid())
-                                    && !skippedUserIds.contains(user.getUid())) {
-                                String currentUserGender = currentUser.getGender() != null ? currentUser.getGender().trim() : "Chưa xác định";
-                                String userGender = user.getGender() != null ? user.getGender().trim() : "Chưa xác định";
+                            if (user != null) {
+                                Log.d(TAG, "loadUsers: Processing user: " + user.getName() + ", UID: " + user.getUid() + ", Gender: " + user.getGender());
+                                if (!user.getUid().equals(currentUserId) && !matchedUserIds.contains(user.getUid()) && !skippedUserIds.contains(user.getUid())) {
+                                    String currentUserGender = currentUser.getGender() != null ? currentUser.getGender().trim() : "Chưa xác định";
+                                    String userGender = user.getGender() != null ? user.getGender().trim() : "Chưa xác định";
 
-                                Log.d(TAG, "Current user gender: " + currentUserGender + ", User: " + (user != null ? user.getName() : "null") + ", Gender: " + userGender);
+                                    if ("Chưa xác định".equals(currentUserGender) || "Chưa xác định".equals(userGender)) {
+                                        Log.w(TAG, "loadUsers: Skipping user " + user.getUid() + " - Gender not set properly");
+                                        continue;
+                                    }
 
-                                if ("Chưa xác định".equals(currentUserGender) || "Chưa xác định".equals(userGender)) {
-                                    Log.w(TAG, "Skipping user " + (user != null ? user.getUid() : "null") + " - Gender not set properly");
-                                    continue;
-                                }
-
-                                if (currentUserGender.equals(userGender)) {
-                                    Log.d(TAG, "Skipping user " + user.getName() + " due to same gender");
-                                    continue;
-                                }
-
-                                if ("Khac".equals(currentUserGender) && ("Nam".equals(userGender) || "Nu".equals(userGender))) {
+                                    // Tạm thời bỏ qua lọc giới tính để kiểm tra
                                     newUsers.add(user);
-                                    Log.d(TAG, "Added user (Khác sees both Nam and Nữ): " + user.getName());
-                                } else if ("Nữ".equals(currentUserGender) && ("Nam".equals(userGender) || ("Khac".equals(userGender) && hasOtherGender))) {
-                                    newUsers.add(user);
-                                    Log.d(TAG, "Added user (Nữ sees Nam and Khác): " + user.getName());
-                                } else if ("Nam".equals(currentUserGender) && ("Nu".equals(userGender) || ("Khac".equals(userGender) && hasOtherGender))) {
-                                    newUsers.add(user);
-                                    Log.d(TAG, "Added user (Nam sees Nữ and Khác): " + user.getName());
+                                    Log.d(TAG, "loadUsers: Added user: " + user.getName());
                                 } else {
-                                    Log.d(TAG, "User skipped (gender mismatch): " + user.getName());
+                                    Log.d(TAG, "loadUsers: Skipping user " + user.getUid() + " (self, matched, or skipped)");
                                 }
                             } else {
-                                Log.d(TAG, "User skipped: " + (user == null ? "null user" :
-                                        (matchedUserIds.contains(user.getUid()) ? "already matched" :
-                                                (skippedUserIds.contains(user.getUid()) ? "already skipped" : "current user"))));
+                                Log.w(TAG, "loadUsers: Null user data for snapshot: " + userSnapshot.getKey());
                             }
                         }
 
@@ -241,12 +223,12 @@ public class nSwipeController {
                             userList.addAll(newUsers);
                             adapter.notifyDataSetChanged();
                             fragment.showUsers();
-                            Log.d(TAG, "Loaded " + newUsers.size() + " new users, total: " + userList.size());
+                            Log.d(TAG, "loadUsers: Loaded " + newUsers.size() + " new users, total: " + userList.size());
                             for (qUser u : userList) {
-                                Log.d(TAG, "User in list: " + u.getName() + ", Gender: " + u.getGender());
+                                Log.d(TAG, "loadUsers: User in list: " + u.getName() + ", Gender: " + u.getGender());
                             }
                         } else {
-                            Log.w(TAG, "No users in this page, trying next page...");
+                            Log.w(TAG, "loadUsers: No users loaded in this page");
                             if (lastUserId != null) {
                                 loadUsers();
                             } else if (userList.isEmpty()) {
@@ -258,7 +240,7 @@ public class nSwipeController {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Error loading users: " + error.getMessage());
+                        Log.e(TAG, "loadUsers: Error loading users: " + error.getMessage());
                         fragment.showError("Lỗi tải danh sách người dùng: " + error.getMessage());
                         isLoading = false;
                     }
@@ -267,7 +249,7 @@ public class nSwipeController {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error loading matches: " + error.getMessage());
+                Log.e(TAG, "loadUsers: Error loading matches: " + error.getMessage());
                 fragment.showError("Lỗi tải danh sách match: " + error.getMessage());
                 isLoading = false;
             }
@@ -280,7 +262,7 @@ public class nSwipeController {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 currentUser = snapshot.getValue(qUser.class);
                 if (currentUser != null) {
-                    Log.d(TAG, "Current user loaded: " + currentUser.getName() + ", Gender: " + currentUser.getGender());
+                    Log.d(TAG, "loadCurrentUser: Current user loaded: " + currentUser.getName() + ", Gender: " + currentUser.getGender());
                     if (currentUser.isLocationEnabled()) {
                         adapter.setCurrentUserLocation(currentUser.getLatitude(), currentUser.getLongitude());
                     } else {
@@ -288,7 +270,7 @@ public class nSwipeController {
                     }
                     loadUsers();
                 } else {
-                    Log.e(TAG, "Current user is null, snapshot: " + snapshot.toString());
+                    Log.e(TAG, "loadCurrentUser: Current user is null, snapshot: " + snapshot.toString());
                     fragment.showError("Không tìm thấy thông tin người dùng hiện tại");
                     new Handler(Looper.getMainLooper()).postDelayed(() -> loadCurrentUser(), 2000);
                 }
@@ -296,7 +278,7 @@ public class nSwipeController {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error loading current user: " + error.getMessage());
+                Log.e(TAG, "loadCurrentUser: Error loading current user: " + error.getMessage());
                 fragment.showError("Lỗi tải thông tin người dùng: " + error.getMessage());
             }
         });
@@ -305,7 +287,7 @@ public class nSwipeController {
     public void handleCardSwiped(Direction direction) {
         Log.d(TAG, "handleCardSwiped: Direction = " + direction.name() + ", isSkipButtonPressed = " + isSkipButtonPressed);
         if (userList.isEmpty()) {
-            Log.w(TAG, "User list is empty during swipe");
+            Log.w(TAG, "handleCardSwiped: User list is empty during swipe");
             return;
         }
 
@@ -313,9 +295,9 @@ public class nSwipeController {
         int index = topPosition;
         Log.d(TAG, "handleCardSwiped: topPosition = " + topPosition + ", userList size = " + userList.size());
         if (index < 0 || index >= userList.size()) {
-            Log.e(TAG, "Invalid index: " + index + ", topPosition: " + topPosition + ", userList size = " + userList.size());
+            Log.e(TAG, "handleCardSwiped: Invalid index: " + index + ", topPosition: " + topPosition + ", userList size = " + userList.size());
             if (topPosition <= 0 && !userList.isEmpty()) {
-                Log.d(TAG, "handleCardSwiped: topPosition is " + topPosition + ", resetting CardStackView");
+                Log.d(TAG, "handleCardSwiped: Resetting CardStackView");
                 adapter.notifyDataSetChanged();
                 cardStackView.scheduleLayoutAnimation();
                 return;
@@ -363,7 +345,7 @@ public class nSwipeController {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e(TAG, "Error checking likes: " + error.getMessage());
+                            Log.e(TAG, "handleCardSwiped: Error checking likes: " + error.getMessage());
                         }
                     });
         }
@@ -424,7 +406,7 @@ public class nSwipeController {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Log.d(TAG, "checkForMatch: Snapshot exists: " + snapshot.exists());
                         if (snapshot.exists()) {
-                            Log.d(TAG, "Mutual like detected, match successful!");
+                            Log.d(TAG, "checkForMatch: Mutual like detected, match successful!");
                             String chatId = currentUserId.compareTo(otherUser.getUid()) < 0
                                     ? currentUserId + "_" + otherUser.getUid()
                                     : otherUser.getUid() + "_" + currentUserId;
@@ -449,7 +431,7 @@ public class nSwipeController {
                             database.child("likedBy").child(otherUser.getUid()).child(currentUserId).removeValue();
 
                             String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
-                            Log.d(TAG, "Match successful with user: " + matchedUserName);
+                            Log.d(TAG, "checkForMatch: Match successful with user: " + matchedUserName);
 
                             fragment.showMatchDialog(matchedUserName, chatId, otherUser);
 
@@ -463,13 +445,13 @@ public class nSwipeController {
                             refreshBundle.putBoolean("refresh", true);
                             fragment.getParentFragmentManager().setFragmentResult("refresh_chat_list", refreshBundle);
                         } else {
-                            Log.d(TAG, "No mutual like found with user: " + otherUser.getName());
+                            Log.d(TAG, "checkForMatch: No mutual like found with user: " + otherUser.getName());
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Error checking match: " + error.getMessage());
+                        Log.e(TAG, "checkForMatch: Error checking match: " + error.getMessage());
                         fragment.showError("Lỗi kiểm tra match: " + error.getMessage());
                     }
                 });
