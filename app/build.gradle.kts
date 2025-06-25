@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -129,8 +128,12 @@ dependencies {
     implementation(libs.rxjava3)
     implementation(libs.rxandroid3)
 
-    // Room with kapt
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    // Nếu bạn dùng annotation processor cho Room, hãy thêm dòng sau:
+    // kapt(libs.room.compiler)
+    // Nếu bạn dùng KSP cho Room, hãy thêm dòng sau:
+    // ksp(libs.room.compiler)
 }
+

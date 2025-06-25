@@ -5,8 +5,8 @@ googleServices = "4.4.2"
 firebase = "33.15.0"
 androidGifDrawable = "1.2.28"
 annotation = "1.9.1"
-appcompatVersion = "1.7.9"
-cardstackview = "3.0.4"
+appcompatVersion = "1.6.1"
+cardstackview = "2.3.4"
 firebaseMessaging = "24.1.1"
 firebaseStorage = "21.0.2"
 glide = "4.16.0"
@@ -68,3 +68,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlinVersion" }
+
