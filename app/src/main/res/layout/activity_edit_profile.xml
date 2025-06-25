@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_profile">
+    android:background="@drawable/background_pink">
 
     <!-- ScrollView for main content -->
     <ScrollView
@@ -20,16 +20,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="60dp"
-            android:padding="12dp">
+            android:padding="24dp">
 
             <!-- Back Arrow -->
             <ImageView
                 android:id="@+id/back_arrow"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="44dp"
                 android:contentDescription="Back"
-                android:src="@drawable/ic_back"
+                android:src="@drawable/ic_arrow_back"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="42dp"
                 android:fontFamily="@font/poppins_regular"
                 android:text="Chỉnh sửa hồ sơ"
                 android:textColor="@android:color/black"
@@ -51,11 +51,11 @@
             <!-- Settings Icon -->
             <ImageView
                 android:id="@+id/settings_icon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="28dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="44dp"
                 android:contentDescription="Settings"
-                android:src="@drawable/ic_settings_profile"
+                android:src="@drawable/setting_5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -95,10 +95,10 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="12dp"
-                android:backgroundTint="#D3D3D3"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Sửa ảnh"
-                android:textColor="@android:color/black"
+                android:backgroundTint="@color/colorPink"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -129,8 +129,8 @@
                 android:hint="Họ tên"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/basic_info_title" />
@@ -146,8 +146,8 @@
                 android:hint="Ngày sinh"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_full_name" />
@@ -163,8 +163,8 @@
                 android:hint="Sở thích"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_dob" />
@@ -180,8 +180,8 @@
                 android:hint="Nơi ở"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_interests" />
@@ -197,8 +197,8 @@
                 android:hint="Mối quan hệ"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_location" />
@@ -214,8 +214,8 @@
                 android:hint="Tôn giáo"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_relationship" />
@@ -231,8 +231,8 @@
                 android:hint="Trình độ học vấn"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_religion" />
@@ -248,8 +248,8 @@
                 android:hint="Nghề nghiệp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:textColor="@android:color/white"
-                android:textColorHint="#B0FFFFFF"
+                android:textColor="@android:color/black"
+                android:textColorHint="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/edit_education" />
@@ -261,10 +261,10 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:backgroundTint="#E6C576EB"
+                android:backgroundTint="@color/colorPink"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Xác nhận"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

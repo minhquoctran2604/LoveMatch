@@ -30,7 +30,8 @@
         android:src="@drawable/gai1"
         app:layout_constraintStart_toEndOf="@id/back_button"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/gai1" />
+        tools:src="@drawable/gai1"
+        android:background="@drawable/circle_background"/>
 
     <!-- Tên người dùng  -->
     <TextView

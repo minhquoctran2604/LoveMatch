@@ -2,6 +2,7 @@ package vn.edu.tlu.cse.lovematch.view.activity.profile;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.widget.ImageButton;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import android.Manifest;
 
 public class qSettingActivity extends AppCompatActivity {
 
+    private ImageButton backButton;
     private Button notificationButton;
     private Button locationButton;
     private TextView locationPermissionStatusText; 
@@ -53,6 +55,7 @@ public class qSettingActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Khởi tạo các view
+        backButton = findViewById(R.id.back_button);
         notificationButton = findViewById(R.id.notification_button);
         locationButton = findViewById(R.id.location_button);
         locationPermissionStatusText = findViewById(R.id.location_permission_status_text); // Ánh xạ TextView
@@ -67,9 +70,13 @@ public class qSettingActivity extends AppCompatActivity {
         checkLocationPermissionAndUI();
 
         // --- Xử lý sự kiện click ---
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
         notificationButton.setOnClickListener(v -> toggleNotifications());
         changePasswordButton.setOnClickListener(v -> showChangePasswordDialog());
         logoutButton.setOnClickListener(v -> logoutUser());
+
     }
 
     @Override

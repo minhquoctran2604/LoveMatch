@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_profile">
+    android:background="@drawable/background_pink">
 
     <!-- ScrollView for main content -->
     <ScrollView
@@ -20,7 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="60dp"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:clickable="true"
+            android:focusable="true">
 
             <!-- Back Arrow -->
             <ImageView
@@ -28,9 +30,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="44dp"
                 android:contentDescription="Back"
-                android:src="@drawable/ic_back"
+                android:src="@drawable/ic_arrow_back"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="44dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Hồ sơ của Quốc"
                 android:textColor="@android:color/black"
@@ -85,10 +87,10 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="16dp"
-                android:backgroundTint="#E6C576EB"
+                app:backgroundTint="@color/colorPink"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Huỷ ghép"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
