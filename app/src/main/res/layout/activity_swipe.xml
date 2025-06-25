@@ -66,23 +66,7 @@
         android:layout_marginBottom="16dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
-
-        <!-- Nút "Hoàn tác" -->
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/undo_button"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:background="@null"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_return"
-                android:stateListAnimator="@drawable/button_scale_animator" />
-        </FrameLayout>
+        
 
         <!-- FrameLayout cho nút "Không thích" (X) -->
         <FrameLayout
@@ -108,6 +92,23 @@
                 android:background="@null"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_dislike2"
+                android:stateListAnimator="@drawable/button_scale_animator" />
+        </FrameLayout>
+
+        <!-- Nút "Hoàn tác" -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/undo_button"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_return"
                 android:stateListAnimator="@drawable/button_scale_animator" />
         </FrameLayout>
 
