@@ -66,8 +66,8 @@ public class nSwipeFragment extends Fragment {
     private nSwipeController controller;
     private FirebaseAuth auth;
     private DatabaseReference database;
-    private DatabaseReference matchNotificationsRef; // Thêm để lắng nghe thông báo match
-    private ValueEventListener matchListener; // Listener cho thông báo match
+    private DatabaseReference matchNotificationsRef;
+    private ValueEventListener matchListener;
     private String currentUserId;
     private List<qUser> userList;
     private nCardStackAdapter adapter;
@@ -233,17 +233,14 @@ public class nSwipeFragment extends Fragment {
         cardStackView.setLayoutManager(layoutManager);
         cardStackView.setAdapter(adapter);
 
-        // Lấy vị trí hiện tại của người dùng
         requestLocationPermission();
 
-        // Thêm listener để làm mới danh sách
         swipeRefreshLayout.setOnRefreshListener(() -> {
             controller.resetPagination();
             controller.loadUsers();
             swipeRefreshLayout.setRefreshing(false);
         });
 
-        // Thêm listener cho nút hoàn tác
         undoButton.setOnClickListener(v -> {
             controller.undoLastSwipe();
         });
@@ -257,14 +254,12 @@ public class nSwipeFragment extends Fragment {
 
         controller = new nSwipeController(this, cardStackView, skipCircle, likeCircle, skipButton, likeButton, null, null, navController, userList, adapter);
 
-        // Lắng nghe thông báo match từ Firebase
         setupMatchListener();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Hủy lắng nghe sự kiện match khi fragment bị hủy
         if (matchNotificationsRef != null && matchListener != null) {
             matchNotificationsRef.removeEventListener(matchListener);
         }
@@ -280,8 +275,7 @@ public class nSwipeFragment extends Fragment {
                     String chatId = matchSnapshot.child("chatId").getValue(String.class);
 
                     if (otherUserId != null && chatId != null) {
-                        // Lấy thông tin người dùng match để hiển thị dialog
-                        DatabaseReference otherUserRef = FirebaseDatabase.getInstance().getReference("users").child(otherUserId);
+                        DatabaseReference otherUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(otherUserId); // Sửa thành "qUser"
                         otherUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot userSnapshot) {
@@ -290,7 +284,6 @@ public class nSwipeFragment extends Fragment {
                                     String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
                                     showMatchDialog(matchedUserName, chatId, otherUser);
                                 }
-                                // Xóa thông báo sau khi hiển thị
                                 matchNotificationsRef.child(matchId).removeValue();
                             }
 
@@ -329,7 +322,7 @@ public class nSwipeFragment extends Fragment {
                 getUserLocation();
             } else {
                 Toast.makeText(getContext(), "Ứng dụng cần quyền truy cập vị trí để tính khoảng cách", Toast.LENGTH_LONG).show();
-                adapter.setCurrentUserLocation(0, 0); // Nếu không có quyền, khoảng cách sẽ hiển thị "N/A"
+                adapter.setCurrentUserLocation(0, 0);
             }
         }
     }
@@ -346,7 +339,7 @@ public class nSwipeFragment extends Fragment {
                 Log.d(TAG, "User location: " + currentLatitude + ", " + currentLongitude);
             } else {
                 Log.w(TAG, "Cannot get user location");
-                adapter.setCurrentUserLocation(0, 0); // Nếu không lấy được vị trí, khoảng cách sẽ hiển thị "N/A"
+                adapter.setCurrentUserLocation(0, 0);
             }
         }).addOnFailureListener(e -> {
             Log.e(TAG, "Error getting location: " + e.getMessage());
@@ -383,7 +376,7 @@ public class nSwipeFragment extends Fragment {
                 MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.swipe_sound2);
                 if (mediaPlayer != null) {
                     mediaPlayer.start();
-                    mediaPlayer.setOnCompletionListener(mp -> mp.release());
+                    mediaPlayer.setOnCompletionListener(MediaPlayer::release);
                 }
             } else {
                 Log.e(TAG, "showLikeAnimationOnButton: topView is null");
@@ -419,7 +412,7 @@ public class nSwipeFragment extends Fragment {
                 MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.swipe_sound2);
                 if (mediaPlayer != null) {
                     mediaPlayer.start();
-                    mediaPlayer.setOnCompletionListener(mp -> mp.release());
+                    mediaPlayer.setOnCompletionListener(MediaPlayer::release);
                 }
             } else {
                 Log.e(TAG, "showSkipAnimationOnButton: topView is null");
@@ -464,7 +457,6 @@ public class nSwipeFragment extends Fragment {
                 return;
             }
 
-            // Add logging here to inspect otherUser and photos
             if (otherUser == null) {
                 Log.e(TAG, "showMatchDialog: otherUser is null!");
             } else {
@@ -483,8 +475,7 @@ public class nSwipeFragment extends Fragment {
             String message = "Bạn và " + matchedUserName + " đã match thành công!";
             matchTitle.setText(message);
 
-            // Lấy ảnh của người dùng hiện tại
-            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("users").child(currentUserId);
+            DatabaseReference currentUserRef = FirebaseDatabase.getInstance().getReference("qUser").child(currentUserId); // Sửa thành "qUser"
             currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -507,7 +498,6 @@ public class nSwipeFragment extends Fragment {
                 }
             });
 
-            // Hiển thị ảnh của người được match
             if (otherUser != null && otherUser.getPhotos() != null && !otherUser.getPhotos().isEmpty()) {
                 Glide.with(getContext())
                         .load(otherUser.getPhotos().get(0))
@@ -522,11 +512,9 @@ public class nSwipeFragment extends Fragment {
                 Log.d(TAG, "Send message button clicked, navigating to chat with chatId: " + chatId);
                 matchDialog.dismiss();
                 Bundle bundle = new Bundle();
-                // Truyền userId và userName của người được match sang ChatUserFragment
                 bundle.putString("userId", otherUser.getUid());
                 bundle.putString("userName", otherUser.getName());
                 try {
-                    // Thay đổi đích đến từ listChatFragment sang chatUserFragment
                     navController.navigate(R.id.action_swipeFragment_to_chatUserFragment, bundle);
                 } catch (Exception e) {
                     Log.e(TAG, "Error navigating to chat: " + e.getMessage());
