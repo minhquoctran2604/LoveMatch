@@ -1,8 +1,11 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.gms.google-services")
-    id("kotlin-kapt")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -17,11 +20,22 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField(
-            "String",
-            "GEMINI_API_KEY",
-            "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
-        )
+        // Read GEMINI_API_KEY from local.properties
+        val geminiApiKey = try {
+            val properties = Properties()
+            val localPropertiesFile = project.rootProject.file("local.properties")
+            if (localPropertiesFile.exists()) {
+                FileInputStream(localPropertiesFile).use { input ->
+                    properties.load(input)
+                }
+                properties.getProperty("GEMINI_API_KEY") ?: ""
+            } else {
+                ""
+            }
+        } catch (e: Exception) {
+            ""
+        }
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildFeatures {
@@ -31,23 +45,43 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = false // Disabled for debugging
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField(
-                "String",
-                "GEMINI_API_KEY",
-                "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
-            )
+            val geminiApiKey = try {
+                val properties = Properties()
+                val localPropertiesFile = project.rootProject.file("local.properties")
+                if (localPropertiesFile.exists()) {
+                    FileInputStream(localPropertiesFile).use { input ->
+                        properties.load(input)
+                    }
+                    properties.getProperty("GEMINI_API_KEY") ?: ""
+                } else {
+                    ""
+                }
+            } catch (e: Exception) {
+                ""
+            }
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
         }
         debug {
-            buildConfigField(
-                "String",
-                "GEMINI_API_KEY",
-                "\"AIzaSyAdJv3gEKJxHW76wTER4mVPh1gTUHszmhM\""
-            )
+            val geminiApiKey = try {
+                val properties = Properties()
+                val localPropertiesFile = project.rootProject.file("local.properties")
+                if (localPropertiesFile.exists()) {
+                    FileInputStream(localPropertiesFile).use { input ->
+                        properties.load(input)
+                    }
+                    properties.getProperty("GEMINI_API_KEY") ?: ""
+                } else {
+                    ""
+                }
+            } catch (e: Exception) {
+                ""
+            }
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
         }
     }
 
@@ -55,23 +89,26 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
-    // AndroidX Core
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.swiperefreshlayout)
-    implementation(libs.cardview)
-    implementation("androidx.recyclerview:recyclerview:1.4.0")
-
-    // Navigation Component
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.swiperefreshlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 
-    // Firebase (bom & services)
+    // CardStackView
+    implementation(libs.cardstackview)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
@@ -79,26 +116,21 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
-
-    // 3rd-party libraries
-    implementation(libs.cardstackview)
+    implementation(libs.firebase.app.check) // Fixed App Check dependency
     implementation(libs.glide)
     implementation(libs.annotation)
     implementation(libs.play.services.location)
+    implementation(libs.cardview)
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.lottie)
 
-    // RxJava 3
+    // RxJava3
     implementation(libs.rxjava3)
     implementation(libs.rxandroid3)
 
-    // Room Database
+    // Room with kapt
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-
-    // Unit Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    kapt(libs.room.compiler)
 }

@@ -27,7 +27,8 @@
 
     <fragment
         android:id="@+id/listChatFragment"
-        android:name="ListChatFragment" />
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.ListChatFragment"
+        android:label="Chat" />
 
     <activity
         android:id="@+id/profileMyFriendActivity"
