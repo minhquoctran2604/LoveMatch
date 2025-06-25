@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import vn.edu.tlu.cse.lovematch.model.data.qUser;
 import vn.edu.tlu.cse.lovematch.model.repository.qUserRepository;
 import vn.edu.tlu.cse.lovematch.R;
@@ -134,44 +137,47 @@ public class qSignUpActivity extends AppCompatActivity {
     }
 
     private void saveUserDataAndNavigate(String email, String username, String residence) {
-        // Kiểm tra xem người dùng hiện tại có tồn tại không (dù ít khi xảy ra sau khi đăng ký thành công)
         if (mAuth.getCurrentUser() == null) {
             showWarning("Lỗi: Không tìm thấy người dùng sau khi đăng ký.");
             return;
         }
 
-        // Tạo đối tượng User mới
         qUser user = new qUser();
         user.setUid(mAuth.getCurrentUser().getUid());
         user.setEmail(email);
         user.setName(username);
-        // Chỉ lưu nơi ở nếu người dùng đã nhập (đã được trim())
         if (!TextUtils.isEmpty(residence)) {
             user.setResidence(residence);
-        } else {
-            user.setResidence(null); // Hoặc chuỗi rỗng "", tùy vào cách bạn muốn xử lý trong DB
         }
+        // Thêm các trường mặc định (nếu cần)
+        user.setGender("Chưa xác định"); // Đặt giá trị tạm thời, sẽ được cập nhật sau
+        user.setDateOfBirth(""); // Cần thêm giao diện nhập ngày sinh sau
+        user.setPhotos(new ArrayList<>()); // Khởi tạo danh sách ảnh rỗng
+        user.setLatitude(0.0);
+        user.setLongitude(0.0);
+        user.setBio("");
+        user.setAge(0);
+        user.setLocationEnabled(false);
+        user.setEducation("");
+        user.setDob("");
+        user.setLocation("");
+        user.setInterests("");
+        user.setRelationship("");
+        user.setMatches(new HashMap<>());
 
-
-        // Gọi phương thức lưu User từ UserRepository
         qUserRepository.saveUser(user, new qUserRepository.OnUserActionListener() {
             @Override
             public void onSuccess() {
-                // Lưu thành công, hiển thị thông báo và chuyển sang màn hình chọn giới tính
                 Toast.makeText(qSignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(qSignUpActivity.this, qSelectGenderActivity.class);
-                // Xóa các activity trước đó khỏi stack để người dùng không quay lại màn hình đăng ký
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                finish(); // Kết thúc SignUpActivity
+                finish();
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                // Lỗi khi lưu dữ liệu vào cơ sở dữ liệu (Firestore/Realtime DB)
-                showWarning("Lỗi khi lưu dữ liệu người dùng: " + errorMessage);
-                // Cân nhắc: Có nên xóa tài khoản Firebase Auth nếu lưu DB thất bại không?
-                // Điều này phức tạp hơn và cần xử lý cẩn thận. Tạm thời chỉ báo lỗi.
+                showWarning("Lỗi khi lưu dữ liệu: " + errorMessage);
             }
         });
     }

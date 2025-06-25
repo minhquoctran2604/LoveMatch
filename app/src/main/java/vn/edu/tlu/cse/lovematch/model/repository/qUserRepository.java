@@ -2,6 +2,7 @@ package vn.edu.tlu.cse.lovematch.model.repository;
 
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -43,23 +44,37 @@ public class qUserRepository {
     }
 
     public void updateUserField(String field, Object value, OnUserActionListener listener) {
-        String currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+
         if (currentUserId == null) {
-            listener.onFailure("Người dùng chưa đăng nhập");
+            Log.w(TAG, "updateUserField: No current user found");
+            listener.onFailure("Người dùng chưa đăng nhập hoặc không hợp lệ");
             return;
         }
 
-        usersReference.child(currentUserId).child(field).setValue(value, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError == null) {
-                    Log.d(TAG, "User field updated successfully: " + field);
+        if (field == null || field.trim().isEmpty()) {
+            Log.w(TAG, "updateUserField: Field name is invalid");
+            listener.onFailure("Tên trường không hợp lệ");
+            return;
+        }
+
+        if (value == null) {
+            Log.w(TAG, "updateUserField: Value is null for field: " + field);
+            listener.onFailure("Giá trị không được để trống");
+            return;
+        }
+
+        DatabaseReference userRef = usersReference.child(currentUserId).child(field);
+        userRef.setValue(value)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "User field updated successfully: " + field + " = " + value);
                     listener.onSuccess();
-                } else {
-                    Log.e(TAG, "Failed to update user field: " + field, databaseError.toException());
-                    listener.onFailure(databaseError.getMessage());
-                }
-            }
-        });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to update user field: " + field, e);
+                    listener.onFailure("Lỗi khi cập nhật trường " + field + ": " + e.getMessage());
+                });
     }
 }
