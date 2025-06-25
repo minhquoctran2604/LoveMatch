@@ -14,7 +14,7 @@ import java.util.List;
 import vn.edu.tlu.cse.lovematch.model.data.Notification;
 
 public class NotificationRepository {
-    private static final String TAG = "NotificationRepo"; // Rút gọn Tag cho dễ nhìn
+    private static final String TAG = "NotificationRepo"; 
     private DatabaseReference userMatchesRef;
     private ValueEventListener notificationsListener;
 
@@ -24,7 +24,6 @@ public class NotificationRepository {
 
     public void getNotifications(final OnResultListener listener) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        // 1. Kiểm tra người dùng đã đăng nhập chưa
         if (currentUser == null) {
             listener.onError("Người dùng chưa đăng nhập.");
             Log.e(TAG, "Lỗi: Người dùng hiện tại là null.");
@@ -32,9 +31,9 @@ public class NotificationRepository {
         }
 
         String currentUserId = currentUser.getUid();
-        // 2. Trỏ đến ĐÚNG ĐƯỜNG DẪN DỮ LIỆU
-        // Đây là nơi chứa toàn bộ thông tin cần thiết, không cần đi đâu khác
-        userMatchesRef = FirebaseDatabase.getInstance().getReference("users").child(currentUserId).child("matches");
+        // Thêm listener cho cả matches và chats
+        userMatchesRef = FirebaseDatabase.getInstance().getReference()
+            .child("users").child(currentUserId).child("matches");
 
         Log.d(TAG, "Đang lắng nghe trên đường dẫn: " + userMatchesRef.toString());
 
@@ -98,6 +97,7 @@ public class NotificationRepository {
     public interface OnResultListener {
         void onSuccess(List<Notification> notifications);
         void onEmpty();
+        void onChatsUpdated(); // Thêm callback mới khi có cập nhật chats
         void onError(String error);
         void onLoading();
     }

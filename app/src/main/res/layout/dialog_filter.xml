@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/distance_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Khoảng cách tối đa (km)"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/age_min_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tuổi tối thiểu"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/age_max_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tuổi tối đa"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/residence_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Khu vực"/>
+
+    <Button
+        android:id="@+id/apply_filter_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Áp dụng"/>
+
+    <Button
+        android:id="@+id/clear_filter_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xóa bộ lọc"/>
+</LinearLayout>

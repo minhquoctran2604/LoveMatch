@@ -48,6 +48,11 @@ public class ListChatController {
             public void onLoading() {
                 // Hiển thị loading indicator nếu cần
             }
+
+            @Override
+            public void onChatsUpdated() {
+                loadNotifications(); // Tải lại danh sách khi có cập nhật chat
+            }
         });
     }
 

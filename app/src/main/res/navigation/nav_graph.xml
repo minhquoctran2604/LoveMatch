@@ -7,7 +7,7 @@
     <!-- SwipeFragment -->
     <fragment
         android:id="@+id/swipeFragment"
-        android:name="vn.edu.tlu.cse.lovematch.view.fragment.SwipeFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.nSwipeFragment"
         android:label="SwipeFragment">
         <action
             android:id="@+id/action_swipeFragment_to_likeFragment"
@@ -36,12 +36,21 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/action_swipeFragment_to_chatUserFragment"
+            app:destination="@id/chatUserFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 
     <!-- LikeFragment -->
     <fragment
         android:id="@+id/likeFragment"
-        android:name="vn.edu.tlu.cse.lovematch.view.fragment.LikeFragment"
+        android:name="vn.edu.tlu.cse.lovematch.view.fragment.nLikeFragment"
         android:label="LikeFragment">
         <action
             android:id="@+id/action_likeFragment_to_swipeFragment"
@@ -176,7 +185,7 @@
     <!-- ProfileMyFriendActivity -->
     <activity
         android:id="@+id/profileMyFriendActivity"
-        android:name="vn.edu.tlu.cse.lovematch.view.activity.profile.ProfileMyFriendActivity"
+        android:name="vn.edu.tlu.cse.lovematch.view.activity.profile.qProfileMyFriendActivity"
         android:label="ProfileMyFriendActivity" />
 
 </navigation>

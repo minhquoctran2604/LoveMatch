@@ -21,10 +21,13 @@ import com.google.firebase.database.ValueEventListener;
 import vn.edu.tlu.cse.lovematch.view.activity.main.MainActivity;
 import vn.edu.tlu.cse.lovematch.view.adapter.qPhotoAdapter;
 import vn.edu.tlu.cse.lovematch.R;
+import android.util.Log; 
 import java.util.ArrayList;
 import java.util.List;
 
 public class qProfileMyFriendActivity extends AppCompatActivity {
+
+    private static final String TAG = "qProfileMyFriendActivity"; // Thêm định nghĩa TAG này
 
     private ImageView backArrow;
     private ImageView avatarImage;
@@ -115,7 +118,7 @@ public class qProfileMyFriendActivity extends AppCompatActivity {
                     }
 
                     // Hiển thị ảnh đại diện
-                    if (avatarUrl != null) {
+                    if (avatarUrl != null && !avatarUrl.isEmpty()) {
                         Glide.with(qProfileMyFriendActivity.this)
                                 .load(avatarUrl)
                                 .placeholder(R.drawable.gai1)
@@ -123,6 +126,7 @@ public class qProfileMyFriendActivity extends AppCompatActivity {
                                 .into(avatarImage);
                     } else {
                         avatarImage.setImageResource(R.drawable.gai1);
+                        Log.w(TAG, "Empty photo URL for user: " + friendId);
                     }
 
                     photoAdapter.notifyDataSetChanged();

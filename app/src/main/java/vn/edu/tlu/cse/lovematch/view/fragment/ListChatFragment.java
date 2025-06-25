@@ -46,7 +46,6 @@ public class ListChatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = Navigation.findNavController(view);
-
         auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() == null) {
@@ -56,31 +55,34 @@ public class ListChatFragment extends Fragment {
             return;
         }
 
+        // Khởi tạo view
         notificationsRecyclerView = view.findViewById(R.id.notifications_recycler_view);
         chatbotButton = view.findViewById(R.id.chatbot_button);
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout); // Khởi tạo SwipeRefreshLayout
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         notificationList = new ArrayList<>();
         adapter = new NotificationAdapter(notificationList, this::onNotificationClicked);
         notificationsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         notificationsRecyclerView.setAdapter(adapter);
 
+        // Xử lý sự kiện
         chatbotButton.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putBoolean("isChatWithAI", true);
             navController.navigate(R.id.action_listChatFragment_to_chatAIFragment, bundle);
         });
 
-        // Thêm listener cho SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            controller.loadNotifications(); // Gọi lại loadNotifications để reload danh sách
-            swipeRefreshLayout.setRefreshing(false); // Tắt hiệu ứng làm mới
+            controller.loadNotifications();
+            swipeRefreshLayout.setRefreshing(false);
         });
 
-        Bundle args = getArguments();
-        if (args != null && args.containsKey("chatId")) {
-            String chatId = args.getString("chatId");
-        }
+        // Đăng ký lắng nghe sự kiện refresh chat list
+        getParentFragmentManager().setFragmentResultListener("refresh_chat_list", this, (requestKey, result) -> {
+            if (result.getBoolean("refresh")) {
+                controller.loadNotifications();
+            }
+        });
 
         controller = new ListChatController(this);
         controller.loadNotifications();
@@ -94,20 +96,19 @@ public class ListChatFragment extends Fragment {
     }
 
     public void updateNotifications(List<Notification> notifications) {
-        Log.d("ListChatFragment", "Updating notifications, size: " + notifications.size());
-        for (Notification n : notifications) {
-            Log.d("ListChatFragment", "Notification: " + n.getUserName() + ", timestamp: " + n.getTimestamp());
-        }
-        notificationList.clear();
-        // Sắp xếp theo timestamp giảm dần (mới nhất lên đầu)
-        Collections.sort(notifications, new Comparator<Notification>() {
-            @Override
-            public int compare(Notification n1, Notification n2) {
-                return Long.compare(n2.getTimestamp(), n1.getTimestamp()); // Giảm dần
-            }
+        requireActivity().runOnUiThread(() -> {
+            Log.d("ListChatFragment", "Updating notifications, size: " + notifications.size());
+            notificationList.clear();
+            // Sắp xếp theo timestamp giảm dần (mới nhất lên đầu)
+            Collections.sort(notifications, (n1, n2) -> Long.compare(n2.getTimestamp(), n1.getTimestamp()));
+            notificationList.addAll(notifications);
+            adapter.notifyDataSetChanged();
+            
+            // Gửi sự kiện refresh chat list
+            Bundle result = new Bundle();
+            result.putBoolean("refresh", true);
+            getParentFragmentManager().setFragmentResult("refresh_chat_list", result);
         });
-        notificationList.addAll(notifications);
-        adapter.notifyDataSetChanged();
     }
 
     public void showError(String error) {

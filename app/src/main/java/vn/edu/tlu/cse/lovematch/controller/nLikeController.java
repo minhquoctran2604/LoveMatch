@@ -1,4 +1,4 @@
-package vn.edu.tlu.cse.amourswip.controller;
+package vn.edu.tlu.cse.lovematch.controller;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -15,19 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import vn.edu.tlu.cse.amourswip.R;
-import vn.edu.tlu.cse.amourswip.model.data.xUser;
-import vn.edu.tlu.cse.amourswip.model.repository.chLikeRepository;
-import vn.edu.tlu.cse.amourswip.view.fragment.chLikeFragment;
+import vn.edu.tlu.cse.lovematch.R;
+import vn.edu.tlu.cse.lovematch.model.data.qUser;
+import vn.edu.tlu.cse.lovematch.model.repository.nLikeRepository;
+import vn.edu.tlu.cse.lovematch.view.fragment.nLikeFragment;
 
 public class nLikeController {
 
-    private static final String TAG = "chLikeController";
+    private static final String TAG = "nLikeController";
     private static final int PAGE_SIZE = 10;
-    private final chLikeFragment fragment;
-    private final chLikeRepository repository;
-    private List<xUser> usersWhoLikedMe;
-    private List<xUser> usersILiked;
+    private final nLikeFragment fragment;
+    private final nLikeRepository repository;
+    private List<qUser> usersWhoLikedMe;
+    private List<qUser> usersILiked;
     private String lastUserIdWhoLikedMe;
     private String lastUserIdILiked;
     private boolean isLikesTabSelected;
@@ -37,9 +37,9 @@ public class nLikeController {
     private String residenceFilter;
     private final DatabaseReference matchNotificationsRef; // Thêm để đẩy thông báo match
 
-    public nLikeController(chLikeFragment fragment) {
+    public nLikeController(nLikeFragment fragment) {
         this.fragment = fragment;
-        this.repository = new chLikeRepository();
+        this.repository = new nLikeRepository();
         this.usersWhoLikedMe = new ArrayList<>();
         this.usersILiked = new ArrayList<>();
         this.lastUserIdWhoLikedMe = null;
@@ -48,7 +48,7 @@ public class nLikeController {
         this.matchNotificationsRef = FirebaseDatabase.getInstance().getReference("match_notifications");
 
         // Load current user location
-        repository.getCurrentUserLocation(new chLikeRepository.OnLocationListener() {
+        repository.getCurrentUserLocation(new nLikeRepository.OnLocationListener() {
             @Override
             public void onSuccess(double latitude, double longitude) {
                 fragment.setCurrentLocation(latitude, longitude);
@@ -87,15 +87,15 @@ public class nLikeController {
     }
 
     private void loadUsersWhoLikedMe() {
-        repository.getUsersWhoLikedMe(new chLikeRepository.OnResultListener() {
+        repository.getUsersWhoLikedMe(new nLikeRepository.OnResultListener() {
             @Override
-            public void onSuccess(List<xUser> users) {
+            public void onSuccess(List<qUser> users) {
                 // Loại bỏ trùng lặp trước khi thêm
                 Set<String> existingUserIds = new HashSet<>();
-                for (xUser existingUser : usersWhoLikedMe) {
+                for (qUser existingUser : usersWhoLikedMe) {
                     existingUserIds.add(existingUser.getUid());
                 }
-                for (xUser newUser : users) {
+                for (qUser newUser : users) {
                     if (!existingUserIds.contains(newUser.getUid())) {
                         usersWhoLikedMe.add(newUser);
                         existingUserIds.add(newUser.getUid());
@@ -126,15 +126,15 @@ public class nLikeController {
     }
 
     private void loadUsersILiked() {
-        repository.getUsersILiked(new chLikeRepository.OnResultListener() {
+        repository.getUsersILiked(new nLikeRepository.OnResultListener() {
             @Override
-            public void onSuccess(List<xUser> users) {
+            public void onSuccess(List<qUser> users) {
                 // Loại bỏ trùng lặp trước khi thêm
                 Set<String> existingUserIds = new HashSet<>();
-                for (xUser existingUser : usersILiked) {
+                for (qUser existingUser : usersILiked) {
                     existingUserIds.add(existingUser.getUid());
                 }
-                for (xUser newUser : users) {
+                for (qUser newUser : users) {
                     if (!existingUserIds.contains(newUser.getUid())) {
                         usersILiked.add(newUser);
                         existingUserIds.add(newUser.getUid());
@@ -164,7 +164,7 @@ public class nLikeController {
         }, lastUserIdILiked, PAGE_SIZE);
     }
 
-    public void onLikeUser(xUser otherUser) {
+    public void onLikeUser(qUser otherUser) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         String currentUserId = repository.getCurrentUserId();
 
@@ -173,15 +173,29 @@ public class nLikeController {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "onLikeUser: Successfully liked user: " + otherUser.getName());
-                        // Thêm người dùng vào danh sách đã thích
-                        usersILiked.add(otherUser);
-
-                        // Xóa người dùng khỏi cả hai danh sách
+                        // Xóa người dùng khỏi danh sách những người đã thích bạn (nếu có)
                         usersWhoLikedMe.removeIf(user -> user.getUid().equals(otherUser.getUid()));
-                        usersILiked.removeIf(user -> user.getUid().equals(otherUser.getUid()));
+
+                        // Thêm người dùng vào danh sách những người bạn đã thích (nếu chưa có)
+                        boolean alreadyLiked = false;
+                        for (qUser user : usersILiked) {
+                            if (user.getUid().equals(otherUser.getUid())) {
+                                alreadyLiked = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyLiked) {
+                            usersILiked.add(otherUser);
+                        }
 
                         // Cập nhật giao diện của tab hiện tại
-                        fragment.updateUserList(isLikesTabSelected ? usersWhoLikedMe : usersILiked);
+                        // Nếu tab "Lượt thích" đang được chọn, cập nhật usersWhoLikedMe. Ngược lại, cập nhật usersILiked.
+                        // Đảm bảo rằng khi người dùng thích một ai đó, danh sách "usersILiked" được cập nhật và hiển thị nếu tab "Đã thích" đang active.
+                        if (isLikesTabSelected) {
+                            fragment.updateUserList(usersWhoLikedMe);
+                        } else {
+                            fragment.updateUserList(usersILiked);
+                        }
 
                         // Lưu vào node likedBy của người được thích
                         database.child("likedBy").child(otherUser.getUid()).child(currentUserId).setValue(true)
@@ -203,26 +217,35 @@ public class nLikeController {
                 });
     }
 
-    public void onDislikeUser(xUser otherUser) {
+    public void onDislikeUser(qUser otherUser) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         String currentUserId = repository.getCurrentUserId();
 
-        database.child("likedBy").child(currentUserId).child(otherUser.getUid()).removeValue()
+        database.child("likes").child(otherUser.getUid()).child("likedUsers").child(currentUserId).removeValue()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, "onDislikeUser: Successfully removed user from likedBy: " + otherUser.getName());
-                        // Xóa người dùng khỏi cả hai danh sách
-                        usersWhoLikedMe.removeIf(user -> user.getUid().equals(otherUser.getUid()));
-                        usersILiked.removeIf(user -> user.getUid().equals(otherUser.getUid()));
-                        fragment.updateUserList(usersWhoLikedMe);
+                        Log.d(TAG, "onDislikeUser: Successfully removed current user from other user's likedUsers: " + otherUser.getName());
+                        database.child("likes").child(currentUserId).child("likedByUsers").child(otherUser.getUid()).removeValue()
+                                .addOnCompleteListener(task2 -> {
+                                    if (task2.isSuccessful()) {
+                                        Log.d(TAG, "onDislikeUser: Successfully removed other user from current user's likedByUsers: " + otherUser.getName());
+                                        // Xóa người dùng khỏi cả hai danh sách cục bộ
+                                        usersWhoLikedMe.removeIf(user -> user.getUid().equals(otherUser.getUid()));
+                                        usersILiked.removeIf(user -> user.getUid().equals(otherUser.getUid()));
+                                        fragment.updateUserList(usersWhoLikedMe); // Cập nhật lại danh sách hiển thị
+                                    } else {
+                                        Log.e(TAG, "onDislikeUser: Error removing other user from current user's likedByUsers: " + task2.getException().getMessage());
+                                        fragment.showError("Lỗi khi bỏ thích: " + task2.getException().getMessage());
+                                    }
+                                });
                     } else {
-                        Log.e(TAG, "onDislikeUser: Error removing user from likedBy: " + task.getException().getMessage());
+                        Log.e(TAG, "onDislikeUser: Error removing current user from other user's likedUsers: " + task.getException().getMessage());
                         fragment.showError("Lỗi khi bỏ thích: " + task.getException().getMessage());
                     }
                 });
     }
 
-    private void checkForMatch(xUser otherUser) {
+    private void checkForMatch(qUser otherUser) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         String currentUserId = repository.getCurrentUserId();
 
@@ -304,9 +327,9 @@ public class nLikeController {
         fragment.updateUserList(isLikesTabSelected ? usersWhoLikedMe : usersILiked);
     }
 
-    private void applyFilterToUsers(List<xUser> users) {
-        List<xUser> filteredUsers = new ArrayList<>();
-        for (xUser user : users) {
+    private void applyFilterToUsers(List<qUser> users) {
+        List<qUser> filteredUsers = new ArrayList<>();
+        for (qUser user : users) {
             // Lọc theo khoảng cách
             double distance = calculateDistance(user);
             if (distance > maxDistance) {
@@ -330,17 +353,17 @@ public class nLikeController {
         users.addAll(filteredUsers);
     }
 
-    private double calculateDistance(xUser user) {
+    private double calculateDistance(qUser user) {
         // Tính khoảng cách dựa trên latitude và longitude (giả định)
         return 0; // Thay bằng logic thực tế nếu cần
     }
 
-    private int calculateAge(xUser user) {
+    private int calculateAge(qUser user) {
         // Tính tuổi dựa trên dateOfBirth (giả định)
         return 25; // Thay bằng logic thực tế nếu cần
     }
 
-    public void onUserClicked(xUser user) {
+    public void onUserClicked(qUser user) {
         // Điều hướng đến ProfileMyFriendActivity hoặc fragment tương ứng
         Bundle bundle = new Bundle();
         bundle.putString("friendId", user.getUid());
@@ -348,11 +371,11 @@ public class nLikeController {
         fragment.getNavController().navigate(R.id.action_likeFragment_to_profileMyFriendActivity, bundle);
     }
 
-    public List<xUser> getUsersWhoLikedMe() {
+    public List<qUser> getUsersWhoLikedMe() {
         return new ArrayList<>(usersWhoLikedMe);
     }
 
-    public List<xUser> getUsersILiked() {
+    public List<qUser> getUsersILiked() {
         return new ArrayList<>(usersILiked);
     }
 
