@@ -2,15 +2,28 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background_pink">
 
-    <!-- Background đã có sẵn -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background_map" />
-
+    <!-- logo -->
     <!-- LinearLayout chứa các thành phần ban đầu -->
+
+    <ImageView
+        android:id="@+id/logo_image"
+        android:layout_width="191dp"
+        android:layout_height="130dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="103dp"
+        android:layout_marginTop="78dp"
+        android:layout_marginEnd="118dp"
+        android:src="@drawable/logo"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/layout_default"
         android:layout_width="match_parent"
@@ -67,12 +80,12 @@
                 android:layout_width="130dp"
                 android:layout_height="56dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="#C87DD7"
                 android:fontFamily="@font/poppins_bold"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
                 android:text="Cho phép"
-                android:textColor="@android:color/black"
+                android:backgroundTint="@color/colorPink"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 app:cornerRadius="50dp" />
 
@@ -87,10 +100,10 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="12dp"
                 android:text="Bỏ qua"
-                android:textColor="#C87DD7"
+                android:textColor="@color/colorPink"
                 android:textSize="16sp"
                 app:cornerRadius="50dp"
-                app:strokeColor="#C87DD7"
+                app:strokeColor="@color/colorPink"
                 app:strokeWidth="2dp" />
         </LinearLayout>
     </LinearLayout>

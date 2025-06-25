@@ -4,5 +4,5 @@
     <solid android:color="@android:color/transparent" />
     <stroke
         android:width="2dp"
-        android:color="@android:color/white" /> <!-- Thêm viền trắng -->
+        android:color="@android:color/black" /> <!-- Thêm viền đen -->
 </shape>

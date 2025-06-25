@@ -1,65 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center">
+    android:background="@drawable/background_pink">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thêm ảnh của bạn"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
+    <!-- Thanh tiêu đề ở trên cùng -->
+
+    <!-- Logo -->
 
     <ImageView
-        android:id="@+id/selected_photo_preview"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginBottom="24dp"
-        android:background="@color/colorPrimary"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_person" />
+        android:id="@+id/logo_image"
+        android:layout_width="191dp"
+        android:layout_height="130dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="109dp"
+        android:src="@drawable/logo"
+        android:textColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/upload_button"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Chọn từ thư viện"
-        android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/camera_button"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Chụp ảnh"
-        android:layout_marginBottom="32dp" />
-
-    <LinearLayout
+    <!-- Khung Card trắng chứa nội dung chính -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_below="@id/logo_image"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="32dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp">
 
-        <Button
-            android:id="@+id/skip_button"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Bỏ qua"
-            android:layout_marginEnd="8dp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
 
-        <Button
-            android:id="@+id/next_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tiếp tục"
-            android:layout_marginStart="8dp" />
+            <!-- ... (Phần tiêu đề, preview ảnh, chọn ảnh/camera giữ nguyên) ... -->
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="ẢNH ĐẠI DIỆN CỦA BẠN"
+                android:textColor="@android:color/black"
+                android:textSize="22sp" />
 
-</LinearLayout>
+            <ImageView
+                android:id="@+id/selected_photo_preview"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="24dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/upload_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_add_photo_alternate" />
+
+                    <Button
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:fontFamily="@font/poppins_regular"
+                        android:text="Tải ảnh"
+                        android:backgroundTint="@color/colorPink"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/camera_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_add_a_photo" />
+
+                    <Button
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:fontFamily="@font/poppins_regular"
+                        android:text="Chụp ảnh"
+                        android:backgroundTint="@color/colorPink"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ========================================================= -->
+            <!-- BẮT ĐẦU PHẦN ĐÃ SỬA ĐỔI: Chứa cả 2 nút Bỏ qua và Tiếp tục  -->
+            <!-- ========================================================= -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Nút Bỏ qua (hoặc Quay lại) -->
+                <Button
+                    android:id="@+id/skip_button"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="BỎ QUA"
+                    android:textColor="#673AB7"
+                    app:strokeColor="#673AB7" />
+
+                <!-- Nút Tiếp tục -->
+                <Button
+                    android:id="@+id/next_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#673AB7"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="TIẾP TỤC" />
+
+            </LinearLayout>
+            <!-- ========================================================= -->
+            <!-- KẾT THÚC PHẦN ĐÃ SỬA ĐỔI                                    -->
+            <!-- ========================================================= -->
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>
