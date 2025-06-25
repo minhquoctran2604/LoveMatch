@@ -2,18 +2,20 @@ package vn.edu.tlu.cse.lovematch.model.data;
 
 
 public class Notification {
-    private String userId; // ID của người dùng gửi thông báo
+    private String userId; // ID của người dùng gửi thông báo (có thể là otherUserId)
     private String userName; // Tên của người dùng
     private String userImage; // URL hình ảnh của người dùng
     private String lastMessage; // Tin nhắn cuối cùng
     private String time; // Thời gian thông báo (định dạng chuỗi)
     private boolean isUnread; // Trạng thái chưa xem
     private long timestamp; // Thời gian tạo thông báo (Unix timestamp)
+    private String chatId; // ID của cuộc trò chuyện
+    private String type; // Loại thông báo (ví dụ: "new_match", "new_message")
 
     public Notification() {
     }
 
-    public Notification(String userId, String userName, String userImage, String lastMessage, String time, boolean isUnread, long timestamp) {
+    public Notification(String userId, String userName, String userImage, String lastMessage, String time, boolean isUnread, long timestamp, String chatId, String type) {
         this.userId = userId;
         this.userName = userName;
         this.userImage = userImage;
@@ -21,6 +23,8 @@ public class Notification {
         this.time = time;
         this.isUnread = isUnread;
         this.timestamp = timestamp;
+        this.chatId = chatId;
+        this.type = type;
     }
 
     public String getUserId() {
@@ -77,5 +81,21 @@ public class Notification {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

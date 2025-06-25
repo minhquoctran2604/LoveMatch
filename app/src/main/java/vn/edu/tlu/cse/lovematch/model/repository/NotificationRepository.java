@@ -11,15 +11,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import vn.edu.tlu.cse.lovematch.model.data.Notification;
 
 public class NotificationRepository {
     private static final String TAG = "NotificationRepo"; 
-    private DatabaseReference userMatchesRef;
-    private ValueEventListener notificationsListener;
+    private DatabaseReference usersRef;
+    private DatabaseReference chatsRef;
+    private ValueEventListener matchesListener;
+    private ValueEventListener chatListener; // Listener cho tin nhắn cuối cùng
 
     public NotificationRepository() {
-        // Constructor để trống, sẽ khởi tạo Ref khi cần để an toàn hơn
+        usersRef = FirebaseDatabase.getInstance().getReference().child("users");
+        chatsRef = FirebaseDatabase.getInstance().getReference().child("chats");
     }
 
     public void getNotifications(final OnResultListener listener) {
@@ -31,65 +36,158 @@ public class NotificationRepository {
         }
 
         String currentUserId = currentUser.getUid();
-        // Thêm listener cho cả matches và chats
-        userMatchesRef = FirebaseDatabase.getInstance().getReference()
-            .child("users").child(currentUserId).child("matches");
+        DatabaseReference matchesRef = FirebaseDatabase.getInstance().getReference().child("matches").child(currentUserId);
 
-        Log.d(TAG, "Đang lắng nghe trên đường dẫn: " + userMatchesRef.toString());
+        Log.d(TAG, "Đang lắng nghe matches trên đường dẫn: " + matchesRef.toString());
 
         listener.onLoading();
 
         // Hủy listener cũ để tránh rò rỉ và gọi lại nhiều lần
-        if (notificationsListener != null) {
-            userMatchesRef.removeEventListener(notificationsListener);
+        if (matchesListener != null) {
+            matchesRef.removeEventListener(matchesListener);
         }
 
-        notificationsListener = new ValueEventListener() {
+        // Sử dụng Map để lưu trữ các chat listener, key là chatId
+        final Map<String, ValueEventListener> activeChatListeners = new HashMap<>();
+
+        matchesListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Gỡ bỏ tất cả các chat listener cũ trước khi thêm mới
+                for (ValueEventListener listener : activeChatListeners.values()) {
+                    chatsRef.removeEventListener(listener);
+                }
+                activeChatListeners.clear();
+
                 List<Notification> notifications = new ArrayList<>();
-                // 3. Kiểm tra xem có dữ liệu không
                 if (dataSnapshot.exists()) {
-                    Log.d(TAG, "Dữ liệu tồn tại. Tìm thấy " + dataSnapshot.getChildrenCount() + " matches.");
-                    // 4. Lặp qua từng match và chuyển nó trực tiếp thành object Notification
+                    Log.d(TAG, "Dữ liệu matches tồn tại. Tìm thấy " + dataSnapshot.getChildrenCount() + " matches.");
+                    final int[] pendingFetches = {0}; // Đếm số lượng fetch đang chờ
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        // Firebase sẽ tự động map các trường trong JSON vào class Notification
-                        Notification notification = snapshot.getValue(Notification.class);
-                        if (notification != null) {
-                            notifications.add(notification);
-                        } else {
-                            Log.w(TAG, "Không thể chuyển đổi snapshot thành Notification object: " + snapshot.getKey());
+                        String matchedUserId = snapshot.getKey();
+                        if (matchedUserId != null) {
+                            pendingFetches[0]++;
+                            // Lấy thông tin chi tiết của người dùng đã match
+                            usersRef.child(matchedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                    if (userSnapshot.exists()) {
+                                        String userName = userSnapshot.child("name").getValue(String.class);
+                                        List<String> photos = (List<String>) userSnapshot.child("photos").getValue();
+                                        String userImage = (photos != null && !photos.isEmpty()) ? photos.get(0) : null;
+
+                                        // Lấy chatId từ node matches
+                                        String chatId = snapshot.child("chatId").getValue(String.class);
+                                        if (chatId == null) {
+                                            Log.w(TAG, "Không tìm thấy chatId cho match với user: " + matchedUserId);
+                                            pendingFetches[0]--;
+                                            return;
+                                        }
+
+                                        // Lắng nghe tin nhắn cuối cùng và trạng thái đọc từ node chats
+                                        ValueEventListener currentChatListener = new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot messagesSnapshot) {
+                                                String lastMessage = "Bạn đã match với nhau!"; 
+                                                long timestamp = snapshot.child("timestamp").getValue(Long.class) != null ? snapshot.child("timestamp").getValue(Long.class) : System.currentTimeMillis(); // Lấy timestamp từ node matches
+                                                boolean isUnread = true; // Mặc định là chưa đọc cho match mới
+
+                                                if (messagesSnapshot.exists()) {
+                                                    for (DataSnapshot messageSnapshot : messagesSnapshot.getChildren()) {
+                                                        lastMessage = messageSnapshot.child("text").getValue(String.class);
+                                                        Long messageTimestamp = messageSnapshot.child("timestamp").getValue(Long.class);
+                                                        if (messageTimestamp != null) {
+                                                            timestamp = messageTimestamp;
+                                                        }
+                                                        // isUnread sẽ được quản lý bởi logic khác hoặc mặc định là true cho tin nhắn mới
+                                                    }
+                                                }
+
+                                                Notification notification = new Notification(
+                                                        matchedUserId,
+                                                        userName,
+                                                        userImage,
+                                                        lastMessage,
+                                                        "", // Thời gian sẽ được định dạng ở Adapter
+                                                        isUnread,
+                                                        timestamp,
+                                                        chatId,
+                                                        "new_match" // Loại thông báo
+                                                );
+                                                // Cập nhật hoặc thêm thông báo vào danh sách
+                                                // Để tránh trùng lặp và cập nhật hiệu quả, cần tìm và thay thế notification cũ
+                                                // hoặc xóa tất cả và thêm lại. Hiện tại, tôi sẽ thêm vào và để ListChatFragment xử lý.
+                                                // Tuy nhiên, để đảm bảo cập nhật đúng, cần một cơ chế tìm kiếm và cập nhật notification cụ thể.
+                                                // Tạm thời, tôi sẽ gọi lại loadNotifications() để làm mới toàn bộ danh sách.
+                                                listener.onChatsUpdated(); // Thông báo cho fragment rằng có cập nhật chat
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Log.e(TAG, "Lỗi khi đọc lastMessage: " + error.getMessage());
+                                            }
+                                        };
+                                        
+                                        // Thêm listener mới và lưu vào map
+                                        chatsRef.child(chatId).child("messages").orderByChild("timestamp").limitToLast(1).addValueEventListener(currentChatListener);
+                                        activeChatListeners.put(chatId, currentChatListener);
+
+                                        // Giảm pendingFetches ở đây vì việc thêm listener đã hoàn tất
+                                        pendingFetches[0]--;
+                                        if (pendingFetches[0] == 0) {
+                                            // Tất cả dữ liệu đã được fetch
+                                            if (notifications.isEmpty()) {
+                                                listener.onEmpty();
+                                            } else {
+                                                listener.onSuccess(notifications);
+                                            }
+                                        }
+
+                                    } else {
+                                        Log.w(TAG, "Không tìm thấy thông tin user cho ID: " + matchedUserId);
+                                        pendingFetches[0]--;
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Log.e(TAG, "Lỗi khi đọc thông tin user: " + error.getMessage());
+                                    pendingFetches[0]--;
+                                }
+                            });
                         }
                     }
+                    if (dataSnapshot.getChildrenCount() == 0) { // Trường hợp không có match nào
+                        listener.onEmpty();
+                    }
                 } else {
-                    Log.d(TAG, "Không có dữ liệu tại đường dẫn được chỉ định.");
-                }
-
-                // 5. GỬI KẾT QUẢ VỀ CHO UI
-                if (notifications.isEmpty()) {
+                    Log.d(TAG, "Không có dữ liệu matches tại đường dẫn được chỉ định.");
                     listener.onEmpty();
-                } else {
-                    // Chỉ gọi onSuccess MỘT LẦN DUY NHẤT với danh sách đầy đủ
-                    listener.onSuccess(notifications);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "Lỗi khi đọc dữ liệu: " + databaseError.getMessage());
+                Log.e(TAG, "Lỗi khi đọc dữ liệu matches: " + databaseError.getMessage());
                 listener.onError(databaseError.getMessage());
             }
         };
 
-        // Gắn listener vào
-        userMatchesRef.addValueEventListener(notificationsListener);
+        matchesRef.addValueEventListener(matchesListener);
     }
 
     // Hàm này để dọn dẹp khi Fragment bị hủy
     public void removeListeners() {
-        if (userMatchesRef != null && notificationsListener != null) {
-            userMatchesRef.removeEventListener(notificationsListener);
-            Log.d(TAG, "Đã gỡ bỏ Firebase listener.");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference matchesRef = FirebaseDatabase.getInstance().getReference().child("matches").child(currentUser.getUid());
+            if (matchesRef != null && matchesListener != null) {
+                matchesRef.removeEventListener(matchesListener);
+                Log.d(TAG, "Đã gỡ bỏ Firebase listener cho matches.");
+            }
+            if (chatListener != null) {
+                // Xử lý gỡ bỏ chat listener nếu cần
+            }
         }
     }
 

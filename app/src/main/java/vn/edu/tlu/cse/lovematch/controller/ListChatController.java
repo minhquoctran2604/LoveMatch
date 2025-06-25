@@ -61,20 +61,16 @@ public class ListChatController {
                 ? currentUserId + "_" + notification.getUserId()
                 : notification.getUserId() + "_" + currentUserId;
 
-        DatabaseReference lastMessageRef = FirebaseDatabase.getInstance().getReference("chats").child(chatId).child("lastMessage");
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("isUnread", false);
-        lastMessageRef.updateChildren(updates)
-                .addOnSuccessListener(aVoid -> {
-                    notification.setUnread(false);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("userId", notification.getUserId());
-                    bundle.putString("userName", notification.getUserName());
-                    fragment.getNavController().navigate(R.id.action_listChatFragment_to_chatUserFragment, bundle);
-                })
-                .addOnFailureListener(e -> {
-                    fragment.showError("Lỗi khi cập nhật trạng thái đọc: " + e.getMessage());
-                });
+        // Mark notification as read locally for UI update
+        notification.setUnread(false);
+        // No need to update Firebase for 'isUnread' as it's not in the provided chat structure.
+        // If 'isUnread' needs to be persisted, a new mechanism would be required (e.g., a separate 'unread_status' node).
+
+        Bundle bundle = new Bundle();
+        bundle.putString("userId", notification.getUserId());
+        bundle.putString("userName", notification.getUserName());
+        bundle.putString("chatId", notification.getChatId()); // Pass chatId to ChatUserFragment
+        fragment.getNavController().navigate(R.id.action_listChatFragment_to_chatUserFragment, bundle);
     }
 
     public void onDestroy() {

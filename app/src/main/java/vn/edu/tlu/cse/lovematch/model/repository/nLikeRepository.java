@@ -65,7 +65,8 @@ public class nLikeRepository {
         List<qUser> usersWhoLikedMe = new ArrayList<>();
         Set<String> userIds = new HashSet<>();
 
-        Query query = database.child("likes").child(currentUserId).child("likedByUsers").orderByKey();
+        // Đường dẫn đúng là "likedBy/{currentUserId}"
+        Query query = database.child("likedBy").child(currentUserId).orderByKey();
         if (lastUserId != null) {
             query = query.startAfter(lastUserId);
         }
@@ -73,73 +74,39 @@ public class nLikeRepository {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Log.d(TAG, "getUsersWhoLikedMe: No users found in likedBy");
+                    Log.d(TAG, "getUsersWhoLikedMe: No users found in likedBy for current user.");
                     listener.onEmpty();
                     return;
                 }
 
-                Log.d(TAG, "getUsersWhoLikedMe: Found " + snapshot.getChildrenCount() + " users in likedBy");
+                Log.d(TAG, "getUsersWhoLikedMe: Found " + snapshot.getChildrenCount() + " users who liked current user.");
+                final int[] pendingFetches = {0}; // Đếm số lượng fetch đang chờ
                 for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
-                    String userId = likeSnapshot.getKey();
-                    if (userId != null && !userIds.contains(userId)) {
-                        database.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    String likedByUserId = likeSnapshot.getKey(); // Lấy key là userId của người đã thích bạn
+                    if (likedByUserId != null && !userIds.contains(likedByUserId)) {
+                        pendingFetches[0]++;
+                        database.child("users").child(likedByUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot userSnapshot) {
                                 if (!userSnapshot.exists()) {
-                                    Log.e(TAG, "getUsersWhoLikedMe: User data not found for uid: " + userId);
-                                    // Tạo user với dữ liệu tối thiểu
+                                    Log.e(TAG, "getUsersWhoLikedMe: User data not found for uid: " + likedByUserId);
                                     qUser minimalUser = new qUser();
-                                    minimalUser.setUid(userId);
+                                    minimalUser.setUid(likedByUserId);
                                     minimalUser.setName("Người dùng không xác định");
                                     usersWhoLikedMe.add(minimalUser);
-                                    userIds.add(userId);
-                                    
-                                    if (userIds.size() == snapshot.getChildrenCount()) {
-                                        listener.onSuccess(usersWhoLikedMe);
-                                    }
-                                    return;
-                                }
-
-                                // Ánh xạ thủ công để xử lý dữ liệu không đầy đủ
-                                qUser user = new qUser();
-                                user.setUid(userId);
-                                user.setName(userSnapshot.child("name").getValue(String.class));
-                                user.setEmail(userSnapshot.child("email").getValue(String.class));
-                                user.setGender(userSnapshot.child("gender").getValue(String.class));
-                                user.setPreferredGender(userSnapshot.child("preferredGender").getValue(String.class));
-                                user.setDateOfBirth(userSnapshot.child("dateOfBirth").getValue(String.class));
-                                user.setReligion(userSnapshot.child("religion").getValue(String.class));
-                                user.setResidence(userSnapshot.child("residence").getValue(String.class));
-                                user.setEducationLevel(userSnapshot.child("educationLevel").getValue(String.class));
-                                user.setOccupation(userSnapshot.child("occupation").getValue(String.class));
-                                user.setDescription(userSnapshot.child("description").getValue(String.class));
-
-                                // Ánh xạ danh sách photos
-                                List<String> photos = new ArrayList<>();
-                                DataSnapshot photosSnapshot = userSnapshot.child("photos");
-                                if (photosSnapshot.exists()) {
-                                    for (DataSnapshot photoSnapshot : photosSnapshot.getChildren()) {
-                                        String photo = photoSnapshot.getValue(String.class);
-                                        if (photo != null) {
-                                            photos.add(photo);
-                                        }
+                                } else {
+                                    qUser user = userSnapshot.getValue(qUser.class);
+                                    if (user != null) {
+                                        user.setUid(likedByUserId); // Đảm bảo UID được set
+                                        usersWhoLikedMe.add(user);
+                                        Log.d(TAG, "getUsersWhoLikedMe: Added user " + (user.getName() != null ? user.getName() : "Unknown") + " (uid: " + likedByUserId + ")");
+                                    } else {
+                                        Log.e(TAG, "getUsersWhoLikedMe: Failed to parse user data for uid: " + likedByUserId);
                                     }
                                 }
-                                user.setPhotos(photos);
-
-                                // Ánh xạ locationEnabled, latitude, longitude
-                                user.setLocationEnabled(userSnapshot.child("locationEnabled").getValue(Boolean.class) != null ?
-                                        userSnapshot.child("locationEnabled").getValue(Boolean.class) : false);
-                                user.setLatitude(userSnapshot.child("latitude").getValue(Double.class) != null ?
-                                        userSnapshot.child("latitude").getValue(Double.class) : 0.0);
-                                user.setLongitude(userSnapshot.child("longitude").getValue(Double.class) != null ?
-                                        userSnapshot.child("longitude").getValue(Double.class) : 0.0);
-
-                                usersWhoLikedMe.add(user);
-                                userIds.add(userId);
-                                Log.d(TAG, "getUsersWhoLikedMe: Added user " + (user.getName() != null ? user.getName() : "Unknown") + " (uid: " + userId + ")");
-
-                                if (userIds.size() == snapshot.getChildrenCount()) {
+                                userIds.add(likedByUserId); // Thêm vào set sau khi xử lý
+                                pendingFetches[0]--;
+                                if (pendingFetches[0] == 0) {
                                     if (usersWhoLikedMe.isEmpty()) {
                                         Log.d(TAG, "getUsersWhoLikedMe: No users found after processing");
                                         listener.onEmpty();
@@ -153,10 +120,21 @@ public class nLikeRepository {
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 Log.e(TAG, "getUsersWhoLikedMe: Error fetching user data: " + error.getMessage());
+                                pendingFetches[0]--;
+                                if (pendingFetches[0] == 0) {
+                                    if (usersWhoLikedMe.isEmpty()) {
+                                        listener.onEmpty();
+                                    } else {
+                                        listener.onSuccess(usersWhoLikedMe);
+                                    }
+                                }
                                 listener.onError(error.getMessage());
                             }
                         });
                     }
+                }
+                if (snapshot.getChildrenCount() == 0) { // Trường hợp không có người dùng nào thích bạn
+                    listener.onEmpty();
                 }
             }
 
@@ -173,7 +151,8 @@ public class nLikeRepository {
         List<qUser> usersILiked = new ArrayList<>();
         Set<String> userIds = new HashSet<>();
 
-        Query query = database.child("likes").child(currentUserId).child("likedUsers").orderByKey();
+        // Đường dẫn đúng là likes/{currentUserId}
+        Query query = database.child("likes").child(currentUserId).orderByKey();
         if (lastUserId != null) {
             query = query.startAfter(lastUserId);
         }
@@ -181,61 +160,75 @@ public class nLikeRepository {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Log.d(TAG, "getUsersILiked: No users found in likes");
+                    Log.d(TAG, "getUsersILiked: No users found in likes for current user.");
                     listener.onEmpty();
                     return;
                 }
 
-                Log.d(TAG, "getUsersILiked: Found " + snapshot.getChildrenCount() + " users in likes");
-                for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
-                    String likedUserId = likeSnapshot.getKey();
-                    if (likedUserId != null && !userIds.contains(likedUserId)) {
-                        database.child("users").child(likedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
-                                if (!userSnapshot.exists()) {
-                                    Log.e(TAG, "getUsersILiked: User data not found for uid: " + likedUserId);
-                                    // Tạo user với dữ liệu tối thiểu
-                                    qUser minimalUser = new qUser();
-                                    minimalUser.setUid(likedUserId);
-                                    minimalUser.setName("Người dùng không xác định");
-                                    usersILiked.add(minimalUser);
-                                    userIds.add(likedUserId);
-                                    
-                                    if (userIds.size() == snapshot.getChildrenCount()) {
-                                        listener.onSuccess(usersILiked);
-                                    }
-                                    return;
-                                }
+                Log.d(TAG, "getUsersILiked: Found " + snapshot.getChildrenCount() + " liked users for current user.");
+                final List<String> likedUserIdsToFetch = new ArrayList<>();
 
+                for (DataSnapshot likeSnapshot : snapshot.getChildren()) {
+                    String likedUserId = likeSnapshot.getKey(); // Lấy key là userId của người đã thích
+                    if (likedUserId != null && !userIds.contains(likedUserId)) {
+                        likedUserIdsToFetch.add(likedUserId);
+                    }
+                }
+
+                if (likedUserIdsToFetch.isEmpty()) {
+                    Log.d(TAG, "getUsersILiked: No actual liked users found after parsing.");
+                    listener.onEmpty();
+                    return;
+                }
+
+                final int[] pendingFetches = {likedUserIdsToFetch.size()};
+                for (String likedUserId : likedUserIdsToFetch) {
+                    database.child("users").child(likedUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                            if (!userSnapshot.exists()) {
+                                Log.e(TAG, "getUsersILiked: User data not found for uid: " + likedUserId);
+                                qUser minimalUser = new qUser();
+                                minimalUser.setUid(likedUserId);
+                                minimalUser.setName("Người dùng không xác định");
+                                usersILiked.add(minimalUser);
+                            } else {
                                 qUser user = userSnapshot.getValue(qUser.class);
                                 if (user != null) {
-                                    user.setUid(likedUserId);
+                                    user.setUid(likedUserId); // Đảm bảo UID được set
                                     usersILiked.add(user);
-                                    userIds.add(likedUserId);
                                     Log.d(TAG, "getUsersILiked: Added user " + (user.getName() != null ? user.getName() : "Unknown") + " (uid: " + likedUserId + ")");
                                 } else {
                                     Log.e(TAG, "getUsersILiked: Failed to parse user data for uid: " + likedUserId);
                                 }
-
-                                if (userIds.size() == snapshot.getChildrenCount()) {
-                                    if (usersILiked.isEmpty()) {
-                                        Log.d(TAG, "getUsersILiked: No users found after processing");
-                                        listener.onEmpty();
-                                    } else {
-                                        Log.d(TAG, "getUsersILiked: Found " + usersILiked.size() + " users");
-                                        listener.onSuccess(usersILiked);
-                                    }
+                            }
+                            userIds.add(likedUserId); // Thêm vào set sau khi xử lý
+                            pendingFetches[0]--;
+                            if (pendingFetches[0] == 0) {
+                                if (usersILiked.isEmpty()) {
+                                    Log.d(TAG, "getUsersILiked: No users found after processing");
+                                    listener.onEmpty();
+                                } else {
+                                    Log.d(TAG, "getUsersILiked: Found " + usersILiked.size() + " users");
+                                    listener.onSuccess(usersILiked);
                                 }
                             }
+                        }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Log.e(TAG, "getUsersILiked: Error fetching user data: " + error.getMessage());
-                                listener.onError(error.getMessage());
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e(TAG, "getUsersILiked: Error fetching user data: " + error.getMessage());
+                            pendingFetches[0]--;
+                            if (pendingFetches[0] == 0) {
+                                if (usersILiked.isEmpty()) {
+                                    listener.onEmpty();
+                                } else {
+                                    listener.onSuccess(usersILiked);
+                                }
                             }
-                        });
-                    }
+                            listener.onError(error.getMessage());
+                        }
+                    });
                 }
             }
 

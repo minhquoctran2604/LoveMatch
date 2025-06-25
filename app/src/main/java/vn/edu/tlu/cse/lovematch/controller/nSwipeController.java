@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects; // Thêm import này
 import java.util.Set;
 import java.util.Stack;
 import vn.edu.tlu.cse.lovematch.R;
@@ -192,61 +193,77 @@ public class nSwipeController {
                             if (user != null && !user.getUid().equals(currentUserId)
                                     && !matchedUserIds.contains(user.getUid())
                                     && !skippedUserIds.contains(user.getUid())) {
-                                // Xử lý giới tính mặc định nếu null/trống
-                                String currentUserGender = currentUser != null ? 
-                                    (currentUser.getGender() != null && !currentUser.getGender().trim().isEmpty() ? 
-                                        currentUser.getGender().trim() : "Chưa xác định") : "Chưa xác định";
-                                        
-                                String userGender = user != null ? 
-                                    (user.getGender() != null && !user.getGender().trim().isEmpty() ? 
-                                        user.getGender().trim() : "Chưa xác định") : "Chưa xác định";
+                                // Xử lý giới tính mặc định nếu null/trống hoặc rỗng sau khi trim
+                                String currentUserGender = "Chưa xác định";
+                                if (currentUser != null) {
+                                    String rawGender = currentUser.getGender();
+                                    if (rawGender != null) {
+                                        String trimmedGender = rawGender.trim();
+                                        if (!trimmedGender.isEmpty()) {
+                                            currentUserGender = trimmedGender;
+                                        }
+                                    }
+                                }
+
+                                String userGender = "Chưa xác định";
+                                if (user != null) {
+                                    String rawGender = user.getGender();
+                                    if (rawGender != null) {
+                                        String trimmedGender = rawGender.trim();
+                                        if (!trimmedGender.isEmpty()) {
+                                            userGender = trimmedGender;
+                                        }
+                                    }
+                                }
                                         
                                 Log.d(TAG, "Current user gender: " + currentUserGender + ", User: " + (user != null ? user.getName() : "null") + ", Gender: " + userGender);
 
                                 // Bỏ qua nếu là "Chưa xác định"
-                                if ("Chưa xác định".equals(currentUserGender) || "Chưa xác định".equals(userGender)) {
+                                if (Objects.equals("Chưa xác định", currentUserGender) || Objects.equals("Chưa xác định", userGender)) {
                                     Log.w(TAG, "Skipping user " + (user != null ? user.getUid() : "null") + 
                                         " - Gender not set properly: current=" + currentUserGender + 
                                         ", other=" + userGender);
                                     continue;
                                 }
                                 
-                                if (!TextUtils.isEmpty(currentUserGender) && !TextUtils.isEmpty(userGender) && currentUserGender.equals(userGender)) {
+                                // Nếu cả hai giới tính đều đã được xác định và giống nhau, bỏ qua
+                                if (TextUtils.equals(currentUserGender, userGender)) {
                                     // Xử lý trường hợp cùng giới tính nếu cần
                                     continue;
                                 }
 
                                 // Người "Khác": Luôn thấy cả "Nam" và "Nữ"
-                                if ("Khác".equals(currentUserGender) && userGender != null) {
-                                    if (("Nam".equals(userGender) || "Nữ".equals(userGender)) && userGender != null) {
+                                if (Objects.equals("Khác", currentUserGender) && userGender != null) {
+                                    if ((Objects.equals("Nam", userGender) || Objects.equals("Nữ", userGender)) && userGender != null) {
                                         newUsers.add(user);
                                         Log.d(TAG, "User added (Khác sees both Nam and Nữ): " + user.getName());
                                     }
                                 }
                                 // Người "Nữ": Nếu có "Khác" thì thấy cả "Khác" và "Nam", nếu không chỉ thấy "Nam"
-                                else if ("Nữ".equals(currentUserGender) && userGender != null) {
+                                else if (Objects.equals("Nữ", currentUserGender) && userGender != null) {
                                     if (hasOtherGender) {
-                                        if (("Khác".equals(userGender) || "Nam".equals(userGender)) && userGender != null) {
+                                        if ((Objects.equals("Khác", userGender) || Objects.equals("Nam", userGender)) && userGender != null) {
                                             newUsers.add(user);
                                             Log.d(TAG, "User added (Nữ sees both Khác and Nam): " + user.getName());
                                         }
                                     } else {
-                                        if ("Nam".equals(userGender)) {
+                                        if (Objects.equals("Nam", userGender)) {
                                             newUsers.add(user);
                                             Log.d(TAG, "User added (Nữ only sees Nam, no Khác available): " + user.getName());
                                         }
                                     }
                                 }
                                 // Người "Nam": Nếu có "Khác" thì thấy cả "Nữ" và "Khác", nếu không chỉ thấy "Nữ"
-                                else if ("Nam".equals(currentUserGender) && userGender != null) {
+                                else if (Objects.equals("Nam", currentUserGender) && userGender != null) {
                                     if (hasOtherGender) {
-                                        if (("Nữ".equals(userGender) || "Khác".equals(userGender)) && userGender != null) {
+                                        if ((Objects.equals("Nữ", userGender) || Objects.equals("Khác", userGender)) && userGender != null) {
                                             newUsers.add(user);
                                             Log.d(TAG, "User added (Nam sees both Nữ and Khác): " + user.getName());
                                         }
                                     } else {
-                                        if ("Nữ".equals(userGender)) {
+                                        if (Objects.equals("Nữ", userGender)) {
                                             newUsers.add(user);
+                                            String userName = (user.getName() != null) ? user.getName() : "Người dùng không tên";
                                             Log.d(TAG, "User added (Nam only sees Nữ, no Khác available): " + user.getName());
                                         }
                                     }
@@ -363,23 +380,23 @@ public class nSwipeController {
             skippedUserIds.add(otherUser.getUid());
             userList.remove(otherUser);
             // Kiểm tra xem otherUser có thích bạn không
-            database.child("likes").child(otherUser.getUid()).child("likedUsers").child(currentUserId)
+            database.child("likes").child(otherUser.getUid()).child(currentUserId)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
-                                // Nếu otherUser đã thích bạn, lưu vào likedByUsers
-                                database.child("likes").child(currentUserId).child("likedByUsers").child(otherUser.getUid()).setValue(true)
+                                // Nếu otherUser đã thích bạn, lưu vào likedBy
+                                database.child("likedBy").child(currentUserId).child(otherUser.getUid()).setValue(true)
                                         .addOnCompleteListener(task -> {
                                             if (task.isSuccessful()) {
-                                                Log.d(TAG, "handleCardSwiped: Updated likedByUsers for user: " + otherUser.getUid());
+                                                Log.d(TAG, "handleCardSwiped: Updated likedBy for user: " + otherUser.getUid());
                                             } else {
-                                                Log.e(TAG, "handleCardSwiped: Error updating likedByUsers: " + task.getException().getMessage());
+                                                Log.e(TAG, "handleCardSwiped: Error updating likedBy: " + task.getException().getMessage());
                                             }
                                         });
                             }
                             // Xóa likes nếu có
-                            database.child("likes").child(otherUser.getUid()).child("likedUsers").child(currentUserId).removeValue();
+                            database.child("likes").child(otherUser.getUid()).child(currentUserId).removeValue();
                             adapter.notifyDataSetChanged();
                             cardStackView.scheduleLayoutAnimation();
                         }
@@ -404,10 +421,13 @@ public class nSwipeController {
         Direction direction = lastAction.direction;
 
         if (direction == Direction.Right) {
-            database.child("likes").child(currentUserId).child("likedUsers").child(user.getUid()).removeValue();
+            database.child("likes").child(currentUserId).child(user.getUid()).removeValue();
+            database.child("likedBy").child(user.getUid()).child(currentUserId).removeValue(); // Xóa likedBy của người được thích
             matchedUserIds.remove(user.getUid());
         } else if (direction == Direction.Left) {
             skippedUserIds.remove(user.getUid());
+            // Nếu người dùng đã bỏ qua, và họ đã thích bạn, hãy xóa likedBy của bạn khỏi họ
+            database.child("likedBy").child(currentUserId).child(user.getUid()).removeValue();
         }
 
         userList.add(0, user);
@@ -418,12 +438,12 @@ public class nSwipeController {
 
     private void likeUser(qUser otherUser) {
         Log.d(TAG, "likeUser: Liking user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
-        database.child("likes").child(currentUserId).child("likedUsers").child(otherUser.getUid()).setValue(true)
+        database.child("likes").child(currentUserId).child(otherUser.getUid()).setValue(true)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "likeUser: Successfully liked user: " + otherUser.getName());
-                        // Lưu vào node likedByUsers của người được thích
-                        database.child("likes").child(otherUser.getUid()).child("likedByUsers").child(currentUserId).setValue(true)
+                        // Lưu vào node likedBy của người được thích
+                        database.child("likedBy").child(otherUser.getUid()).child(currentUserId).setValue(true)
                                 .addOnCompleteListener(likedByTask -> {
                                     if (likedByTask.isSuccessful()) {
                                         Log.d(TAG, "likeUser: Successfully updated likedBy for user: " + otherUser.getUid());
@@ -440,7 +460,7 @@ public class nSwipeController {
 
     private void checkForMatch(qUser otherUser) {
         Log.d(TAG, "checkForMatch: Checking for match with user: " + otherUser.getName() + " (uid: " + otherUser.getUid() + ")");
-        database.child("likes").child(otherUser.getUid()).child("likedUsers").child(currentUserId)
+        database.child("likes").child(otherUser.getUid()).child(currentUserId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -452,22 +472,26 @@ public class nSwipeController {
                                     : otherUser.getUid() + "_" + currentUserId;
 
                             // Lưu thông tin match cho cả hai bên
-                            database.child("matches").child(currentUserId).child(otherUser.getUid()).setValue(true);
-                            database.child("matches").child(otherUser.getUid()).child(currentUserId).setValue(true);
+                            Map<String, Object> matchInfo = new HashMap<>();
+                            matchInfo.put("chatId", chatId);
+                            matchInfo.put("timestamp", ServerValue.TIMESTAMP); // Sử dụng ServerValue.TIMESTAMP để có timestamp chính xác từ server
+
+                            database.child("matches").child(currentUserId).child(otherUser.getUid()).setValue(matchInfo);
+                            database.child("matches").child(otherUser.getUid()).child(currentUserId).setValue(matchInfo);
 
                             // Tạo chat room với thông tin ban đầu
                             Map<String, Object> chatData = new HashMap<>();
                             chatData.put("participants/" + currentUserId, true);
                             chatData.put("participants/" + otherUser.getUid(), true);
                             chatData.put("lastMessage", "Bạn đã match với nhau!");
-                            chatData.put("lastMessageTime", System.currentTimeMillis());
+                            chatData.put("lastMessageTime", ServerValue.TIMESTAMP); // Sử dụng ServerValue.TIMESTAMP
                             database.child("chats").child(chatId).updateChildren(chatData);
 
                             // Xóa thông tin lượt thích của cả hai bên trên Firebase
-                            database.child("likes").child(currentUserId).child("likedUsers").child(otherUser.getUid()).removeValue();
-                            database.child("likes").child(currentUserId).child("likedByUsers").child(otherUser.getUid()).removeValue();
-                            database.child("likes").child(otherUser.getUid()).child("likedUsers").child(currentUserId).removeValue();
-                            database.child("likes").child(otherUser.getUid()).child("likedByUsers").child(currentUserId).removeValue();
+                            database.child("likes").child(currentUserId).child(otherUser.getUid()).removeValue();
+                            database.child("likedBy").child(currentUserId).child(otherUser.getUid()).removeValue();
+                            database.child("likes").child(otherUser.getUid()).child(currentUserId).removeValue();
+                            database.child("likedBy").child(otherUser.getUid()).child(currentUserId).removeValue();
 
                             String matchedUserName = otherUser.getName() != null ? otherUser.getName() : "người dùng này";
                             Log.d(TAG, "Match successful with user: " + matchedUserName);
@@ -484,7 +508,9 @@ public class nSwipeController {
                             adapter.notifyDataSetChanged();
 
                             // Thông báo để cập nhật danh sách chat
-                            fragment.getParentFragmentManager().setFragmentResult("refresh_chat_list", new Bundle());
+                            Bundle refreshBundle = new Bundle();
+                            refreshBundle.putBoolean("refresh", true);
+                            fragment.getParentFragmentManager().setFragmentResult("refresh_chat_list", refreshBundle);
                         } else {
                             Log.d(TAG, "No mutual like found with user: " + otherUser.getName());
                         }
